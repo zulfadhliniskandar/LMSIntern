@@ -1,4 +1,5 @@
 <x-layouts::app.sidebar :title="$title ?? null">
+    <link rel="stylesheet" href="/css/filament/filament/app.css">
     <flux:main>
         {{ $slot }}
     </flux:main>

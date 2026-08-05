@@ -1,0 +1,1 @@
+@livewire('details-and-material-subject', ['subject' => $subject])

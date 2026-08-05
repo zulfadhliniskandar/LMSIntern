@@ -41,4 +41,9 @@ class Student extends Model
     {
         return $this->hasMany(subjectTaking::class, 'student_id');
     }
+
+    public function appointments()
+    {
+        return $this->hasMany(AppointmentWithAdvisor::class, 'student_id', 'student_id');
+    }
 }

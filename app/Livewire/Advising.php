@@ -6,11 +6,14 @@ use Livewire\Attributes\Validate;
 use Livewire\Component;
 use App\Models\Programme;
 use App\Models\advising as AdvisingModel;
+use App\Models\Subject;
+use App\Models\subjectTaking;
 
 
 
 class Advising extends Component
 {
+    public $subjectAlreadyEnrolled;
     public $subjectForProgrammeEnrolled;
     public $advisor;
     #[Validate([
@@ -22,9 +25,17 @@ class Advising extends Component
     public function mount()
     {
         $student = auth()->user()->student;
+
+        if(!$student){
+            abort(403);
+        }
+        
         $this->advisor = $student?->advisorInstructor;
 
         $this->subjectForProgrammeEnrolled = $student?->programme?->subjects ?? collect();
+        
+        $this->subjectAlreadyEnrolled = SubjectTaking::where('student_id', $student->student_id)->get();
+        //dd($this->subjectAlreadyEnrolled);
     }
 
     public function render()

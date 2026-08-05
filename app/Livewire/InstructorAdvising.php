@@ -22,6 +22,10 @@ class InstructorAdvising extends Component
     {
         $instructor = auth()->user()->instructor;
 
+        if(!$instructor){
+            abort(403);
+        }
+
         $this->advisingRequests = $instructor
             ? AdvisingModel::where('instructor_id', $instructor->instructor_id)->latest()->get()
             : collect();
@@ -61,9 +65,17 @@ class InstructorAdvising extends Component
 
         $this->advisingRequests = AdvisingModel::where('instructor_id', $instructor->instructor_id)->latest()->get();
 
+        if ($this->selectedRequest && $this->selectedRequest->id === $request->id) {
+            $this->selectedRequest = $request->fresh(['student.user', 'student.programme']);
+        }
+        $this->showDetailsModal = false;
+
         session()->flash('success', 'Advising request approved successfully.');
+
+        return $this->redirect(route('instructor-advising'), navigate: true);
     }
-     public function reject($id)
+
+    public function reject($id)
     {
         $instructor = auth()->user()->instructor;
         if (!$instructor) {
@@ -90,7 +102,14 @@ class InstructorAdvising extends Component
 
         $this->advisingRequests = AdvisingModel::where('instructor_id', $instructor->instructor_id)->latest()->get();
 
+        if ($this->selectedRequest && $this->selectedRequest->id === $request->id) {
+            $this->selectedRequest = $request->fresh(['student.user', 'student.programme']);
+        }
+        $this->showDetailsModal = false;
+
         session()->flash('success', 'Advising request rejected successfully.');
+
+        return $this->redirect(route('instructor-advising'), navigate: true);
     }
 
     public function render()

@@ -3,6 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\Instructor;
+use App\Models\Programme;
+use App\Models\MaterialsForSubject;
 
 class Subjects extends Model
 {
@@ -16,13 +21,18 @@ class Subjects extends Model
         'fee',
     ];
 
-    public function instructor()
+    public function instructor() : BelongsTo
     {
         return $this->belongsTo(Instructor::class, 'instructor_id', 'instructor_id');
     }
 
-    public function programme()
+    public function programme() : BelongsTo
     {
         return $this->belongsTo(Programme::class, 'programme_id');
+    }
+
+    public function materials() : HasMany
+    {
+        return $this->hasMany(MaterialsForSubject::class, 'subject_id');
     }
 }

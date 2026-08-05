@@ -184,9 +184,15 @@
                         @foreach($subjectForProgrammeEnrolled as $subject)
                             <div
                                 class="py-4 flex items-center justify-between hover:bg-slate-50/50 dark:hover:bg-zinc-800/20 px-2 rounded-xl transition-all duration-150">
+                                @php
+                                    $isEnrolled = $subjectAlreadyEnrolled->contains('subject_id', $subject->id);
+                                @endphp
                                 <div class="flex items-center gap-3">
-                                    <flux:checkbox wire:model.live="applySubject" :disabled="$hasPending"
-                                        value="{{ $subject->id }}" />
+                                    @if($isEnrolled)
+                                        <flux:checkbox checked disabled value="{{ $subject->id }}" />
+                                    @else
+                                        <flux:checkbox wire:model.live="applySubject" :disabled="$hasPending" value="{{ $subject->id }}" />
+                                    @endif
                                     <div>
                                         <div class="flex flex-wrap items-center gap-2">
                                             <span

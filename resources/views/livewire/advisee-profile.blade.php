@@ -1,0 +1,210 @@
+<div class="max-w-7xl mx-auto space-y-6">
+    @if(session()->has('success'))
+        <div class="bg-green-500 dark:bg-green-900 text-white px-4 py-3 rounded-lg">
+            {{ session('success') }}
+        </div>
+    @endif
+    {{-- Top Navigation & Back Link --}}
+    <div class="flex items-center justify-between">
+        <a href="{{ route('advisee-for-advisor') }}" wire:navigate
+            class="inline-flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Back to My Advisees
+        </a>
+
+        <span
+            class="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+            Active Advisee
+        </span>
+    </div>
+
+    {{-- Student Hero Profile Card --}}
+    <div
+        class="relative overflow-hidden bg-white dark:bg-zinc-800 rounded-2xl border border-gray-200 dark:border-zinc-700 shadow-sm">
+        {{-- Banner Background --}}
+        <div class="h-28 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 opacity-90"></div>
+
+        <div class="px-6 pb-6 pt-0 relative flex flex-col md:flex-row md:items-end md:justify-between gap-4 -mt-12">
+            <div class="flex flex-col sm:flex-row items-center sm:items-end gap-4 text-center sm:text-left">
+                {{-- Avatar --}}
+                <div
+                    class="w-24 h-24 rounded-2xl bg-indigo-600 dark:bg-indigo-500 text-white font-bold text-3xl flex items-center justify-center border-4 border-white dark:border-zinc-800 shadow-md uppercase tracking-wider">
+                    {{ substr($advisee->name, 0, 2) }}
+                </div>
+
+                <div class="mt-2 sm:mt-0">
+                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+                        {{ $advisee->name }}
+                    </h1>
+                    <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2 mt-1">
+                        <span
+                            class="inline-flex items-center gap-1 text-xs font-mono font-medium px-2.5 py-0.5 rounded-md bg-indigo-50 text-indigo-700 dark:bg-indigo-950/50 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+                            ID: {{ $advisee->student?->student_id ?? 'N/A' }}
+                        </span>
+                        <span class="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                            {{ $advisee->email }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-center sm:justify-start gap-2">
+                <span
+                    class="px-3 py-1 text-xs font-medium bg-gray-100 dark:bg-zinc-700 text-gray-700 dark:text-gray-300 rounded-lg">
+                    {{ $advisee->student?->programme?->name ?? 'No Programme Assigned' }}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    {{-- Pending Appointment Card --}}
+    @if($pendingAppointment)
+        <div
+            class="bg-amber-50/70 dark:bg-amber-950/20 rounded-2xl border border-amber-200 dark:border-amber-800/50 p-6 shadow-sm">
+            <div
+                class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-amber-200/60 dark:border-amber-800/40">
+                <div class="flex items-center gap-3">
+                    <div class="p-2.5 bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-300 rounded-xl">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-amber-900 dark:text-amber-200">
+                            Pending Appointment Request
+                        </h3>
+                        <p class="text-xs text-amber-700 dark:text-amber-400">
+                            This advisee has requested an advising appointment with you.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <button wire:confirm="Are you sure you want to accept this appointment?" wire:click="confirmAppointment"
+                        wire:loading.attr="disabled"
+                        class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 rounded-xl shadow-sm transition-all disabled:opacity-50">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        Confirm Appointment
+                    </button>
+
+                    <button wire:confirm="Are you sure you want to reject this appointment?" wire:click="rejectAppointment"
+                        wire:loading.attr="disabled"
+                        class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-rose-700 dark:text-rose-300 bg-rose-100 dark:bg-rose-950/50 hover:bg-rose-200 dark:hover:bg-rose-900/60 rounded-xl border border-rose-200 dark:border-rose-800 transition-all disabled:opacity-50">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                        Reject Appointment
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 text-sm">
+                <div
+                    class="bg-white/80 dark:bg-zinc-800/80 p-3.5 rounded-xl border border-amber-200/50 dark:border-amber-900/40">
+                    <span class="text-xs text-gray-500 dark:text-gray-400 block font-medium">Requested Date</span>
+                    <span class="font-semibold text-gray-900 dark:text-white mt-0.5 block">
+                        {{ \Carbon\Carbon::parse($pendingAppointment->date_appointment)->format('F d, Y') }}
+                    </span>
+                </div>
+
+                <div
+                    class="bg-white/80 dark:bg-zinc-800/80 p-3.5 rounded-xl border border-amber-200/50 dark:border-amber-900/40">
+                    <span class="text-xs text-gray-500 dark:text-gray-400 block font-medium">Requested Time</span>
+                    <span class="font-semibold text-gray-900 dark:text-white mt-0.5 block">
+                        {{ \Carbon\Carbon::parse($pendingAppointment->time_appointment)->format('h:i A') }}
+                    </span>
+                </div>
+
+                <div
+                    class="bg-white/80 dark:bg-zinc-800/80 p-3.5 rounded-xl border border-amber-200/50 dark:border-amber-900/40 md:col-span-1">
+                    <span class="text-xs text-gray-500 dark:text-gray-400 block font-medium">Student Note / Purpose</span>
+                    <span class="font-medium text-gray-800 dark:text-gray-200 mt-0.5 block italic">
+                        "{{ $pendingAppointment->note ?? 'No note provided' }}"
+                    </span>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    {{-- Academic Overview Grid --}}
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {{-- Academic Info Card --}}
+        <div class="bg-white dark:bg-zinc-800 rounded-2xl border border-gray-200 dark:border-zinc-700 p-6 shadow-sm">
+            <h2 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2 mb-4">
+                <svg class="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0112 20.055a11.952 11.952 0 01-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+                </svg>
+                Academic Information
+            </h2>
+
+            <dl class="divide-y divide-gray-100 dark:divide-zinc-700/60 text-sm">
+                <div class="py-3 flex justify-between">
+                    <dt class="text-gray-500 dark:text-gray-400">Student ID</dt>
+                    <dd class="font-mono font-semibold text-gray-900 dark:text-white">
+                        {{ $advisee->student?->student_id ?? 'N/A' }}</dd>
+                </div>
+                <div class="py-3 flex justify-between">
+                    <dt class="text-gray-500 dark:text-gray-400">Programme</dt>
+                    <dd class="font-medium text-gray-900 dark:text-white text-right">
+                        {{ $advisee->student?->programme?->name ?? 'N/A' }}</dd>
+                </div>
+                <div class="py-3 flex justify-between">
+                    <dt class="text-gray-500 dark:text-gray-400">Programme Code</dt>
+                    <dd class="font-mono font-medium text-gray-900 dark:text-white">
+                        {{ $advisee->student?->programme?->code ?? 'N/A' }}</dd>
+                </div>
+                <div class="py-3 flex justify-between">
+                    <dt class="text-gray-500 dark:text-gray-400">Department</dt>
+                    <dd class="font-medium text-gray-900 dark:text-white text-right">
+                        {{ $advisee->student?->programme?->department?->name ?? 'N/A' }}</dd>
+                </div>
+            </dl>
+        </div>
+
+        {{-- Contact & Status Card --}}
+        <div class="bg-white dark:bg-zinc-800 rounded-2xl border border-gray-200 dark:border-zinc-700 p-6 shadow-sm">
+            <h2 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2 mb-4">
+                <svg class="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                Account Details
+            </h2>
+
+            <dl class="divide-y divide-gray-100 dark:divide-zinc-700/60 text-sm">
+                <div class="py-3 flex justify-between">
+                    <dt class="text-gray-500 dark:text-gray-400">Full Name</dt>
+                    <dd class="font-medium text-gray-900 dark:text-white">{{ $advisee->name }}</dd>
+                </div>
+                <div class="py-3 flex justify-between">
+                    <dt class="text-gray-500 dark:text-gray-400">Email Address</dt>
+                    <dd class="font-medium text-gray-900 dark:text-white">{{ $advisee->email }}</dd>
+                </div>
+                <div class="py-3 flex justify-between">
+                    <dt class="text-gray-500 dark:text-gray-400">Registered Date</dt>
+                    <dd class="font-medium text-gray-900 dark:text-white">
+                        {{ $advisee->created_at ? $advisee->created_at->format('M d, Y') : 'N/A' }}</dd>
+                </div>
+                <div class="py-3 flex justify-between">
+                    <dt class="text-gray-500 dark:text-gray-400">Advising Status</dt>
+                    <dd class="font-medium text-emerald-600 dark:text-emerald-400">Assigned</dd>
+                </div>
+            </dl>
+        </div>
+    </div>
+</div>

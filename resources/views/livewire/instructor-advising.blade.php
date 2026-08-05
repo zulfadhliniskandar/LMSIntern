@@ -273,24 +273,20 @@
                 <!-- Modal Footer -->
                 <div class="flex justify-end gap-2 pt-4">
 
-                    @if($selectedRequest->status == 'Pending')
+                    @if(strtolower($selectedRequest->status) === 'pending')
                         <div class="flex items-center justify-end gap-2">
                             <flux:button size="sm" variant="primary" icon="check"
-                                wire:confirm="Are you sure to approve this application" wire:click="approve({{ $request->id }})"
+                                wire:confirm="Are you sure to approve this application?" wire:click="approve({{ $selectedRequest->id }})"
                                 class="font-semibold">
                                 Approve
                             </flux:button>
                             <flux:button size="sm" variant="danger" icon="x-mark"
-                                wire:confirm="Are you sure to reject this application" wire:click="reject({{ $request->id }})"
+                                wire:confirm="Are you sure to reject this application?" wire:click="reject({{ $selectedRequest->id }})"
                                 class="font-semibold">
                                 Reject
                             </flux:button>
                         </div>
-                    @elseif($selectedRequest->status == 'Approved')
-                        <flux:modal.close>
-                            <flux:button variant="filled">Close</flux:button>
-                        </flux:modal.close>
-                    @elseif($selectedRequest->status == 'Rejected')
+                    @else
                         <flux:modal.close>
                             <flux:button variant="filled">Close</flux:button>
                         </flux:modal.close>

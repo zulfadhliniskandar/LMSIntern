@@ -41,4 +41,9 @@ class Instructor extends Model
     {
         return $this->hasMany(advising::class, 'instructor_id', 'instructor_id');
     }
+
+    public function appointments()
+    {
+        return $this->hasMany(AppointmentWithAdvisor::class, 'instructor_id', 'instructor_id');
+    }
 }

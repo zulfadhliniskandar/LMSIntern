@@ -60,6 +60,16 @@
                         wire:navigate>
                         {{ __('Advising') }}
                     </flux:sidebar.item>
+                    <flux:sidebar.item icon="user-plus" :href="route('advisor')" :current="request()->routeIs('advisor')"
+                        wire:navigate>
+                        {{ __('My Advisor') }}
+                    </flux:sidebar.item>
+                </flux:sidebar.group>
+                <flux:sidebar.group :heading="__('Academic')" class="grid">
+                    <flux:sidebar.item icon="book-open" :href="route('taking-course')"
+                        :current="request()->routeIs('taking-course*', 'student-course-details*')" wire:navigate>
+                        {{ __('My Courses') }}
+                    </flux:sidebar.item>
 
                 </flux:sidebar.group>
             </flux:sidebar.nav>
@@ -71,13 +81,46 @@
                         :current="request()->routeIs('instructor-advising')" wire:navigate>
                         {{ __('Advising') }}
                         @php
-                            $pendingAdvisingRequests = auth()->user()->instructor->advisingRequests()->where('status', 'pending')->count();
+                            $pendingAdvisingRequests = auth()->user()->instructor?->advisingRequests()->where('status', 'pending')->count() ?? 0;
                         @endphp
                         @if ($pendingAdvisingRequests > 0)
-                                    <span
-                                        class="ml-20 px-1 py-1 text-xs font-medium bg-rose-500/20 dark:bg-rose-900/20 text-rose-500 dark:text-rose-400 rounded-full">{{
-                            $pendingAdvisingRequests }}</span>
+                            <span
+                                class="ml-auto px-2 py-0.5 text-xs font-semibold bg-rose-500/20 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 rounded-full inline-flex items-center justify-center min-w-[20px]">
+                                {{ $pendingAdvisingRequests }}
+                            </span>
                         @endif
+                    </flux:sidebar.item>
+                    <flux:sidebar.item icon="user-plus" :href="route('instructor-advising-copy')"
+                        :current="request()->routeIs('instructor-advising-copy')" wire:navigate>
+                        {{ __('Advising Copy') }}
+                        @php
+                            $pendingAdvisingRequests = auth()->user()->instructor?->advisingRequests()->where('status', 'pending')->count() ?? 0;
+                        @endphp
+                        @if ($pendingAdvisingRequests > 0)
+                            <span
+                                class="ml-auto px-2 py-0.5 text-xs font-semibold bg-rose-500/20 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 rounded-full inline-flex items-center justify-center min-w-[20px]">
+                                {{ $pendingAdvisingRequests }}
+                            </span>
+                        @endif
+                    </flux:sidebar.item>
+                    <flux:sidebar.item icon="book-open" :href="route('advisee-for-advisor')"
+                        :current="request()->routeIs('advisee-for-advisor', 'student-profile*')" wire:navigate>
+                        {{ __('My Students') }}
+                        @php
+                            $pendingAppointmentRequests = auth()->user()->instructor?->appointments()->where('status', 'pending')->count() ?? 0;
+                        @endphp
+                        @if ($pendingAppointmentRequests > 0)
+                            <span
+                                class="ml-auto px-2 py-0.5 text-xs font-semibold bg-rose-500/20 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 rounded-full inline-flex items-center justify-center min-w-[20px]">
+                                {{ $pendingAppointmentRequests }}
+                            </span>
+                        @endif
+                    </flux:sidebar.item>
+                </flux:sidebar.group>
+                <flux:sidebar.group :heading="__('Academic')" class="grid">
+                    <flux:sidebar.item icon="book-open" :href="route('instructor-course')"
+                        :current="request()->routeIs('instructor-course*')" wire:navigate>
+                        {{ __('My Courses') }}
                     </flux:sidebar.item>
                 </flux:sidebar.group>
             </flux:sidebar.nav>
@@ -153,6 +196,7 @@
     @endpersist
 
     @fluxScripts
+    @filamentScripts
 </body>
 
 </html>
