@@ -16,7 +16,8 @@ use App\Livewire\AdvisorPageForStudent;
 use App\Livewire\AdviseeForAdvisorPage;
 use App\Livewire\AdviseeProfile;
 use App\Livewire\InstructorAdvisingCopy;
-
+use App\Livewire\CreateAssignment;
+use App\Livewire\DetailsEachAssignment;
 
 
 Route::view('/', 'welcome')->name('home');
@@ -38,6 +39,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/advisee-for-advisor', AdviseeForAdvisorPage::class)->name('advisee-for-advisor'); //done 403 instructor
     Route::get('/student-profile/{studentId}', AdviseeProfile::class)->name('student-profile'); //done 403 instructor
     Route::get('/instructor-advising-copy', InstructorAdvisingCopy::class)->name('instructor-advising-copy');
+    Route::get('instructor-course/{subject}/assignment', CreateAssignment::class)->name('instructor-course-assignment');
+    Route::get('/taking-course/{subject}/{assignment}', DetailsEachAssignment::class)->name('course-assignment-details');
     Route::impersonate();
 });
 

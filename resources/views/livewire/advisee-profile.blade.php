@@ -155,22 +155,26 @@
                 <div class="py-3 flex justify-between">
                     <dt class="text-gray-500 dark:text-gray-400">Student ID</dt>
                     <dd class="font-mono font-semibold text-gray-900 dark:text-white">
-                        {{ $advisee->student?->student_id ?? 'N/A' }}</dd>
+                        {{ $advisee->student?->student_id ?? 'N/A' }}
+                    </dd>
                 </div>
                 <div class="py-3 flex justify-between">
                     <dt class="text-gray-500 dark:text-gray-400">Programme</dt>
                     <dd class="font-medium text-gray-900 dark:text-white text-right">
-                        {{ $advisee->student?->programme?->name ?? 'N/A' }}</dd>
+                        {{ $advisee->student?->programme?->name ?? 'N/A' }}
+                    </dd>
                 </div>
                 <div class="py-3 flex justify-between">
                     <dt class="text-gray-500 dark:text-gray-400">Programme Code</dt>
                     <dd class="font-mono font-medium text-gray-900 dark:text-white">
-                        {{ $advisee->student?->programme?->code ?? 'N/A' }}</dd>
+                        {{ $advisee->student?->programme?->code ?? 'N/A' }}
+                    </dd>
                 </div>
                 <div class="py-3 flex justify-between">
                     <dt class="text-gray-500 dark:text-gray-400">Department</dt>
                     <dd class="font-medium text-gray-900 dark:text-white text-right">
-                        {{ $advisee->student?->programme?->department?->name ?? 'N/A' }}</dd>
+                        {{ $advisee->student?->programme?->department?->name ?? 'N/A' }}
+                    </dd>
                 </div>
             </dl>
         </div>
@@ -198,7 +202,8 @@
                 <div class="py-3 flex justify-between">
                     <dt class="text-gray-500 dark:text-gray-400">Registered Date</dt>
                     <dd class="font-medium text-gray-900 dark:text-white">
-                        {{ $advisee->created_at ? $advisee->created_at->format('M d, Y') : 'N/A' }}</dd>
+                        {{ $advisee->created_at ? $advisee->created_at->format('M d, Y') : 'N/A' }}
+                    </dd>
                 </div>
                 <div class="py-3 flex justify-between">
                     <dt class="text-gray-500 dark:text-gray-400">Advising Status</dt>
@@ -207,4 +212,80 @@
             </dl>
         </div>
     </div>
+
+    {{-- Subject History & Current Enrollment Section --}}
+    <div class="bg-white dark:bg-zinc-800 rounded-2xl border border-gray-200 dark:border-zinc-700 shadow-sm overflow-hidden">
+        {{-- Section Header & Navigation Tabs --}}
+        <div class="p-6 pb-4 border-b border-gray-200 dark:border-zinc-700/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+                <h2 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                    <svg class="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                    Academic Subjects Overview
+                </h2>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                    View active course enrollments and completed subject history for this advisee.
+                </p>
+            </div>
+
+            {{-- Segmented Tab Switcher --}}
+            <div class="inline-flex p-1 bg-gray-100 dark:bg-zinc-900 rounded-xl border border-gray-200/80 dark:border-zinc-700/60">
+                <button wire:click="setTab('current')"
+                    class="inline-flex items-center gap-2 px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-all {{ $activeTab === 'current' ? 'bg-white dark:bg-zinc-800 text-indigo-600 dark:text-indigo-400 shadow-sm' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white' }}">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                    Currently Taking
+                    <span class="px-2 py-0.5 text-[10px] font-bold rounded-full {{ $activeTab === 'current' ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300' : 'bg-gray-200 text-gray-700 dark:bg-zinc-800 dark:text-gray-300' }}">
+                        {{ $currentSubjectsCount }}
+                    </span>
+                </button>
+
+                <button wire:click="setTab('completed')"
+                    class="inline-flex items-center gap-2 px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-all {{ $activeTab === 'completed' ? 'bg-white dark:bg-zinc-800 text-emerald-600 dark:text-emerald-400 shadow-sm' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white' }}">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Completed
+                    <span class="px-2 py-0.5 text-[10px] font-bold rounded-full {{ $activeTab === 'completed' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300' : 'bg-gray-200 text-gray-700 dark:bg-zinc-800 dark:text-gray-300' }}">
+                        {{ $completedSubjectsCount }}
+                    </span>
+                </button>
+
+                <button wire:click="setTab('all')"
+                    class="inline-flex items-center gap-2 px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-all {{ $activeTab === 'all' ? 'bg-white dark:bg-zinc-800 text-gray-900 dark:text-white shadow-sm' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white' }}">
+                    View All
+                </button>
+            </div>
+        </div>
+
+        {{-- Tab Content Area --}}
+        <div class="p-6 space-y-6">
+            @if($showCurrentSubjects)
+                <div>
+                    @if($activeTab === 'all')
+                        <h3 class="text-sm font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+                            Currently Taking Subjects ({{ $currentSubjectsCount }})
+                        </h3>
+                    @endif
+                    <livewire:list-current-subjects :studentId="$advisee->id" />
+                </div>
+            @endif
+
+            @if($showCompletedSubjects)
+                <div>
+                    @if($activeTab === 'all')
+                        <h3 class="text-sm font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                            Completed Subjects ({{ $completedSubjectsCount }})
+                        </h3>
+                    @endif
+                    <livewire:list-taken-subject :studentId="$advisee->id" />
+                </div>
+            @endif
+        </div>
+    </div>
+
 </div>

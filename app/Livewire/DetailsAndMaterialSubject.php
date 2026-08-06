@@ -8,6 +8,8 @@ use Livewire\WithFileUploads;
 use App\Models\MaterialsForSubject;
 use App\Models\User;
 use Illuminate\Support\Facades\Storage;
+use App\Models\Assignment;
+
 
 class DetailsAndMaterialSubject extends Component
 {
@@ -17,6 +19,7 @@ class DetailsAndMaterialSubject extends Component
     public ?MaterialsForSubject $selectedMaterial = null;
     public Subjects $subject;
     public $materials = [];
+    public $assignment = [];
 
     public bool $showEditModal = false;
 
@@ -42,6 +45,7 @@ class DetailsAndMaterialSubject extends Component
         $this->user = auth()->user();
         $this->subject = $subject;
         $this->loadMaterials();
+        $this->loadAssignment();
     }
 
     public function loadMaterials()
@@ -53,6 +57,16 @@ class DetailsAndMaterialSubject extends Component
             abort(403);
         }
         $this->materials = MaterialsForSubject::where('subject_id', $this->subject->id)->latest()->get();
+    }
+    public function loadAssignment()
+    {
+        $instructor = auth()->user()->instructor;
+        $student = auth()->user()->student;
+        
+        if(!$instructor && !$student){
+            abort(403);
+        }
+        $this->assignment = Assignment::where('subjects_id', $this->subject->id)->latest()->get();
     }
 
     public function openModal($id)
@@ -251,6 +265,28 @@ class DetailsAndMaterialSubject extends Component
             $material->delete();
             $this->loadMaterials();
             session()->flash('success', 'Material deleted successfully');
+        }
+    }
+
+    public function deleteAssignment($id)
+    {
+        $instructor = auth()->user()->instructor;
+        if(!$instructor){
+            abort(403);
+        }
+        $assignment = Assignment::find($id);
+        if ($assignment) {
+            if (is_array($assignment->file_path)) {
+                $filesToDelete = $assignment->file_path['files'] ?? [];
+                foreach ($filesToDelete as $file) {
+                    if (!empty($file['path']) && Storage::disk('public')->exists($file['path'])) {
+                        Storage::disk('public')->delete($file['path']);
+                    }
+                }
+            }
+            $assignment->delete();
+            $this->loadAssignment();
+            session()->flash('success', 'Assignment deleted successfully.');
         }
     }
 
