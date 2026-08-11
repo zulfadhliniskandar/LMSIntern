@@ -65,12 +65,30 @@
                         {{ __('My Advisor') }}
                     </flux:sidebar.item>
                 </flux:sidebar.group>
-                <flux:sidebar.group :heading="__('Academic')" class="grid">
+                <flux:sidebar.group :heading="__('Academic & AI Tools')" class="grid">
                     <flux:sidebar.item icon="book-open" :href="route('taking-course')"
                         :current="request()->routeIs('taking-course*', 'student-course-details*')" wire:navigate>
                         {{ __('My Courses') }}
                     </flux:sidebar.item>
-
+                    <flux:sidebar.item icon="sparkles" :href="route('simplification-service')"
+                        :current="request()->routeIs('simplification-service')" wire:navigate>
+                        {{ __('Text Simplification') }}
+                    </flux:sidebar.item>
+                    <flux:sidebar.item icon="question-mark-circle" :href="route('ai-quiz-generator')"
+                        :current="request()->routeIs('ai-quiz-generator*', 'materials.quiz-generator*', 'quizzes.show*')"
+                        wire:navigate>
+                        {{ __('AI Quiz Generator') }}
+                    </flux:sidebar.item>
+                    <flux:sidebar.item icon="speaker-wave" :href="route('audio-generator')"
+                        :current="request()->routeIs('audio-generator*', 'audio-upload*')"
+                        wire:navigate>
+                        {{ __('Audio Generator') }}
+                    </flux:sidebar.item>
+                    <flux:sidebar.item icon="sparkles" :href="route('notebooklm-audio')"
+                        :current="request()->routeIs('notebooklm-audio*')"
+                        wire:navigate>
+                        {{ __('NotebookLM Podcast') }}
+                    </flux:sidebar.item>
                 </flux:sidebar.group>
             </flux:sidebar.nav>
         @endif

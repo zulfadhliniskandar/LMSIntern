@@ -35,4 +35,18 @@ return [
         ],
     ],
 
+    'gptzero' => [
+        'api_key' => env('GPTZERO_API_KEY'),
+    ],
+
+    'gemini' => [
+        'api_key' => env('GEMINI_API_KEY'),
+        'model' => env('GEMINI_MODEL', 'gemini-flash-latest'),
+    ],
+
+    'python' => [
+        'path' => env('PYTHON_PATH', PHP_OS_FAMILY === 'Windows' ? 'python' : 'python3'),
+    ],
+
 ];
+

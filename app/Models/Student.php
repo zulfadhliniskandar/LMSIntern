@@ -46,4 +46,9 @@ class Student extends Model
     {
         return $this->hasMany(AppointmentWithAdvisor::class, 'student_id', 'student_id');
     }
+
+    public function submissions()
+    {
+        return $this->hasMany(AssignmentSubmission::class, 'student_id', 'student_id');
+    }
 }

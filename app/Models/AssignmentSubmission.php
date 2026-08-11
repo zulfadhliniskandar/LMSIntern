@@ -28,4 +28,9 @@ class AssignmentSubmission extends Model
     {
         return $this->belongsTo(Student::class, 'student_id');
     }
+
+    public function checkPlagiarism()
+    {
+        return $this->hasOne(check_plagiarism::class, 'assignment_submissions_id');
+    }
 }

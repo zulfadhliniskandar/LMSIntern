@@ -6,6 +6,7 @@ use Livewire\Component;
 use App\Models\Assignment;
 use App\Models\AssignmentSubmission;
 use Livewire\WithFileUploads;
+use App\Jobs\CheckPlagiarism;
 
 
 class DetailsEachAssignment extends Component
@@ -27,7 +28,7 @@ class DetailsEachAssignment extends Component
             $targetId = $targetId->id;
         }
 
-        $this->assignment = Assignment::with(['subject', 'submissions'])->findOrFail($targetId);
+        $this->assignment = Assignment::with(['subject', 'submissions.student.user'])->findOrFail($targetId);
 
         $studentId = auth()->user()->student?->student_id;
         if ($studentId) {
@@ -106,13 +107,17 @@ class DetailsEachAssignment extends Component
 
         $studentId = auth()->user()->student?->student_id;
 
-        AssignmentSubmission::create([
+        $submission = AssignmentSubmission::create([
             'assignment_id' => $this->assignment->id,
             'student_id' => $studentId,
             'submission_text' => null,
             'status' => 'Submitted',
             'file_path' => $filePathData,
         ]);
+
+        CheckPlagiarism::dispatch($submission);
+
+        $this->dispatch('submissionSuccess', message: 'Assignment Submitted! Plagiarism check in progress');
 
         session()->flash('success', 'Assignment submitted successfully!');
 

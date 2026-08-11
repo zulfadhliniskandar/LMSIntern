@@ -18,7 +18,18 @@ use App\Livewire\AdviseeProfile;
 use App\Livewire\InstructorAdvisingCopy;
 use App\Livewire\CreateAssignment;
 use App\Livewire\DetailsEachAssignment;
-
+use App\Livewire\ListStudentNotSubmitAssignment;
+use App\Livewire\ListStudentSubmitAssignment;
+use App\Livewire\DetailsEachSubmission;
+use App\Livewire\LearningMaterialUpload;
+use App\Livewire\QuizGenerator;
+use App\Livewire\AIQuizGeneratorPage;
+use App\Http\Controllers\LearningMaterialController;
+use App\Http\Controllers\QuizController;
+use App\Http\Controllers\AudioController;
+use App\Livewire\AudioGenrator;
+use App\Livewire\UploadMaterialForAudioGeneration;
+use App\Livewire\NotebooklmAudioGenerator;
 
 Route::view('/', 'welcome')->name('home');
 
@@ -41,6 +52,24 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/instructor-advising-copy', InstructorAdvisingCopy::class)->name('instructor-advising-copy');
     Route::get('instructor-course/{subject}/assignment', CreateAssignment::class)->name('instructor-course-assignment');
     Route::get('/taking-course/{subject}/{assignment}', DetailsEachAssignment::class)->name('course-assignment-details');
+    Route::get('instructor-course/{subject}/assignment/{assignment}/student-not-submitted', ListStudentNotSubmitAssignment::class)->name('student-not-submitted');
+    Route::get('instructor-course/{subject}/assignment/{assignment}/student-submitted', ListStudentSubmitAssignment::class)->name('student-submitted');
+    Route::get('/simplification-service', LearningMaterialUpload::class)->name('simplification-service');
+    Route::get('/ai-quiz-generator', AIQuizGeneratorPage::class)->name('ai-quiz-generator');
+    Route::post('/simplification-service/upload', [LearningMaterialController::class, 'upload'])->name('simplification-service.upload');
+    Route::get('instructor-course/{subject}/assignment/{assignment}/submission/{submission}', DetailsEachSubmission::class)->name('submission-details');
+    Route::get('/materials/{material}/quiz-generator', QuizGenerator::class)->name('materials.quiz-generator');
+    Route::post('/materials/{material}/generate-quiz', [QuizController::class, 'generate'])->name('materials.generate-quiz');
+    Route::get('/quizzes/{quiz}', [QuizController::class, 'show'])->name('quizzes.show');
+    Route::get('/audio/{audio}/stream', [AudioController::class, 'stream'])->name('audio.stream');
+    Route::get('/audio/{audio}/download', [AudioController::class, 'download'])->name('audio.download');
+    Route::get('/notebooklm-audio/{notebooklmGen}/stream', [AudioController::class, 'streamNotebooklm'])->name('notebooklm-audio.stream');
+    Route::get('/notebooklm-audio/{notebooklmGen}/download', [AudioController::class, 'downloadNotebooklm'])->name('notebooklm-audio.download');
+    
+    // Livewire component
+    Route::get('/audio-generator', AudioGenrator::class)->name('audio-generator');
+    Route::get('/audio-upload', UploadMaterialForAudioGeneration::class)->name('audio-upload');
+    Route::get('/notebooklm-audio', NotebooklmAudioGenerator::class)->name('notebooklm-audio');
     Route::impersonate();
 });
 

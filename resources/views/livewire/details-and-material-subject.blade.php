@@ -332,6 +332,15 @@
                                     </svg>
                                 </a>
                                 @if (auth()->user()?->isInstructor())
+                                    <button wire:click="openAssignmentModal({{ $item->id }})"
+                                        class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/40 dark:hover:bg-indigo-900/60 text-indigo-600 dark:text-indigo-400 text-xs font-semibold transition-colors cursor-pointer shrink-0"
+                                        title="Edit Assignment">
+                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                        </svg>
+                                        <span>Edit</span>
+                                    </button>
                                     <button wire:confirm="Are you sure you want to delete this assignment?"
                                         wire:click="deleteAssignment({{ $item->id }})"
                                         class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 text-rose-600 dark:text-rose-400 text-xs font-semibold transition-colors cursor-pointer shrink-0"
@@ -587,6 +596,203 @@
                                 </div>
                                 @if(count($editLinks) > 1)
                                     <button type="button" wire:click="removeEditLink({{ $index }})"
+                                        class="text-slate-400 hover:text-rose-500 transition-colors p-1" title="Remove Link">
+                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                    </button>
+                                @endif
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+
+                <!-- Modal Actions -->
+                <div class="flex items-center justify-end gap-2 pt-4 border-t border-slate-100 dark:border-zinc-800">
+                    <flux:modal.close>
+                        <flux:button variant="filled">Cancel</flux:button>
+                    </flux:modal.close>
+                    <flux:button type="submit" variant="primary" icon="check" class="font-semibold">
+                        Save Changes
+                    </flux:button>
+                </div>
+            </form>
+        @endif
+    </flux:modal>
+
+    <!-- Edit Assignment Modal -->
+    <flux:modal name="edit-assignment-modal" wire:model="showEditAssignmentModal" class="max-w-xl">
+        @if ($selectedAssignment)
+            <form wire:submit.prevent="updateAssignment" class="space-y-5">
+                <!-- Modal Header -->
+                <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-zinc-800">
+                    <div class="flex items-center gap-2">
+                        <div class="p-2 bg-purple-50 dark:bg-purple-950/50 text-purple-600 dark:text-purple-400 rounded-xl">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <flux:heading size="lg" class="font-bold">Edit Assignment</flux:heading>
+                            <p class="text-xs text-slate-500 dark:text-zinc-400">Update title, description, due date, files, or reference links</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Title Input -->
+                <div class="space-y-1.5">
+                    <label class="block text-xs font-bold text-slate-700 dark:text-zinc-300 uppercase tracking-wider">
+                        Assignment Title <span class="text-rose-500">*</span>
+                    </label>
+                    <input type="text" wire:model="editAssignmentTitle" required
+                        class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 rounded-xl text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all" />
+                    @error('editAssignmentTitle')
+                        <p class="text-xs text-rose-500 font-medium mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Description Input -->
+                <div class="space-y-1.5">
+                    <label class="block text-xs font-bold text-slate-700 dark:text-zinc-300 uppercase tracking-wider">
+                        Description / Instructions <span class="text-slate-400 font-normal text-xs">(Optional)</span>
+                    </label>
+                    <textarea wire:model="editAssignmentDescription" rows="3"
+                        class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 rounded-xl text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all resize-none"></textarea>
+                </div>
+
+                <!-- Due Date & Time Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-bold text-slate-700 dark:text-zinc-300 uppercase tracking-wider">
+                            Due Date <span class="text-rose-500">*</span>
+                        </label>
+                        <input type="date" wire:model="editAssignmentDate" required
+                            class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 rounded-xl text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all" />
+                        @error('editAssignmentDate')
+                            <p class="text-xs text-rose-500 font-medium mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-bold text-slate-700 dark:text-zinc-300 uppercase tracking-wider">
+                            Due Time <span class="text-rose-500">*</span>
+                        </label>
+                        <input type="time" wire:model="editAssignmentTime" required
+                            class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 rounded-xl text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all" />
+                        @error('editAssignmentTime')
+                            <p class="text-xs text-rose-500 font-medium mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+
+                <!-- Existing Attached Files -->
+                <div class="space-y-2 pt-2 border-t border-slate-100 dark:border-zinc-800">
+                    <label class="block text-xs font-bold text-slate-700 dark:text-zinc-300 uppercase tracking-wider">
+                        Current Attached Files ({{ count($editAssignmentFiles) }})
+                    </label>
+                    @if(!empty($editAssignmentFiles))
+                        <div class="space-y-1.5 max-h-40 overflow-y-auto pr-1">
+                            @foreach($editAssignmentFiles as $index => $fileItem)
+                                <div
+                                    class="flex items-center justify-between p-2.5 bg-slate-50 dark:bg-zinc-900 rounded-xl border border-slate-200 dark:border-zinc-800 text-xs">
+                                    <div class="flex items-center gap-2 truncate pr-2">
+                                        <svg class="w-4 h-4 text-purple-500 shrink-0" fill="none" viewBox="0 0 24 24"
+                                            stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                        </svg>
+                                        <span
+                                            class="font-medium text-slate-700 dark:text-zinc-300 truncate">{{ $fileItem['original_name'] ?? 'Attached File' }}</span>
+                                    </div>
+                                    <button type="button" wire:click="removeExistingAssignmentFile({{ $index }})"
+                                        class="text-slate-400 hover:text-rose-500 transition-colors p-1" title="Remove File">
+                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <p class="text-xs text-slate-400 dark:text-zinc-500 italic">No existing files attached.</p>
+                    @endif
+                </div>
+
+                <!-- Upload Additional Files -->
+                <div class="space-y-2 pt-2">
+                    <label class="block text-xs font-bold text-slate-700 dark:text-zinc-300 uppercase tracking-wider">
+                        Upload Additional Files
+                    </label>
+                    <div
+                        class="relative border-2 border-dashed border-slate-200 dark:border-zinc-700 hover:border-purple-500 dark:hover:border-purple-400 rounded-xl p-4 transition-colors bg-slate-50/50 dark:bg-zinc-900/40 text-center">
+                        <input type="file" wire:model="newAssignmentFiles" multiple accept=".pdf,.doc,.docx,.ppt,.pptx,.zip,.rar"
+                            class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
+                        <div
+                            class="flex items-center justify-center gap-2 pointer-events-none text-xs text-slate-600 dark:text-zinc-400 font-medium">
+                            <svg class="w-4 h-4 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                            </svg>
+                            <span>Click to add more assignment files</span>
+                        </div>
+                    </div>
+
+                    <!-- New Uploads Preview -->
+                    @if(!empty($accumulatedNewAssignmentFiles))
+                        <div class="space-y-1.5 pt-1">
+                            <span
+                                class="text-[11px] font-bold text-purple-600 dark:text-purple-400 uppercase tracking-wider block">New
+                                Files to Add ({{ count($accumulatedNewAssignmentFiles) }})</span>
+                            <div class="space-y-1 max-h-32 overflow-y-auto">
+                                @foreach($accumulatedNewAssignmentFiles as $index => $newFile)
+                                    <div
+                                        class="flex items-center justify-between p-2 bg-purple-50/60 dark:bg-purple-950/40 rounded-lg border border-purple-100 dark:border-purple-900/50 text-xs">
+                                        <span
+                                            class="font-medium text-purple-900 dark:text-purple-200 truncate pr-2">{{ $newFile->getClientOriginalName() }}</span>
+                                        <button type="button" wire:click="removeNewAssignmentFile({{ $index }})"
+                                            class="text-purple-400 hover:text-rose-500 transition-colors p-1">
+                                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+                </div>
+
+                <!-- External Links -->
+                <div class="space-y-3 pt-3 border-t border-slate-100 dark:border-zinc-800">
+                    <div class="flex items-center justify-between">
+                        <label class="block text-xs font-bold text-slate-700 dark:text-zinc-300 uppercase tracking-wider">
+                            Reference Links
+                        </label>
+                        <button type="button" wire:click="addEditAssignmentLink"
+                            class="inline-flex items-center gap-1 text-xs font-semibold text-purple-600 dark:text-purple-400 hover:underline">
+                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                            </svg>
+                            Add Link
+                        </button>
+                    </div>
+
+                    <div class="space-y-2 max-h-48 overflow-y-auto pr-1">
+                        @foreach($editAssignmentLinks as $index => $link)
+                            <div
+                                class="flex items-center gap-2 p-2.5 bg-slate-50 dark:bg-zinc-900 rounded-xl border border-slate-200 dark:border-zinc-800">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 flex-grow">
+                                    <input type="text" wire:model="editAssignmentLinks.{{ $index }}.title"
+                                        placeholder="Link Title (e.g. Reference Specs)"
+                                        class="px-3 py-1.5 bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded-lg text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-purple-500" />
+                                    <input type="url" wire:model="editAssignmentLinks.{{ $index }}.url" placeholder="https://..."
+                                        class="px-3 py-1.5 bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded-lg text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-purple-500" />
+                                </div>
+                                @if(count($editAssignmentLinks) > 1)
+                                    <button type="button" wire:click="removeEditAssignmentLink({{ $index }})"
                                         class="text-slate-400 hover:text-rose-500 transition-colors p-1" title="Remove Link">
                                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

@@ -34,6 +34,18 @@ class DetailsAndMaterialSubject extends Component
     public $newFiles = [];
     public $accumulatedNewFiles = [];
 
+    // Assignment Edit fields
+    public ?Assignment $selectedAssignment = null;
+    public bool $showEditAssignmentModal = false;
+    public $editAssignmentTitle = '';
+    public $editAssignmentDescription = '';
+    public $editAssignmentDate = '';
+    public $editAssignmentTime = '';
+    public $editAssignmentFiles = [];
+    public $editAssignmentLinks = [];
+    public $newAssignmentFiles = [];
+    public $accumulatedNewAssignmentFiles = [];
+
     public function mount(Subjects $subject)
     {
         $instructor = auth()->user()->instructor;
@@ -288,6 +300,194 @@ class DetailsAndMaterialSubject extends Component
             $this->loadAssignment();
             session()->flash('success', 'Assignment deleted successfully.');
         }
+    }
+
+    public function openAssignmentModal($id)
+    {
+        $instructor = auth()->user()->instructor;
+        if(!$instructor){
+            abort(403);
+        }
+        $this->selectedAssignment = Assignment::findOrFail($id);
+        $this->editAssignmentTitle = $this->selectedAssignment->title;
+        $this->editAssignmentDescription = $this->selectedAssignment->description ?? '';
+
+        if ($this->selectedAssignment->due_date) {
+            $carbonDate = \Carbon\Carbon::parse($this->selectedAssignment->due_date);
+            $this->editAssignmentDate = $carbonDate->format('Y-m-d');
+            $this->editAssignmentTime = $carbonDate->format('H:i');
+        } else {
+            $this->editAssignmentDate = date('Y-m-d');
+            $this->editAssignmentTime = '23:59';
+        }
+
+        $filePathData = $this->selectedAssignment->file_path;
+        if (is_array($filePathData)) {
+            $this->editAssignmentFiles = $filePathData['files'] ?? [];
+            $this->editAssignmentLinks = $filePathData['links'] ?? [];
+        } else {
+            $this->editAssignmentFiles = [];
+            $this->editAssignmentLinks = [];
+        }
+
+        if (empty($this->editAssignmentLinks)) {
+            $this->editAssignmentLinks = [['title' => '', 'url' => '']];
+        }
+
+        $this->newAssignmentFiles = [];
+        $this->accumulatedNewAssignmentFiles = [];
+        $this->showEditAssignmentModal = true;
+    }
+
+    public function addEditAssignmentLink()
+    {
+        $instructor = auth()->user()->instructor;
+        if(!$instructor){
+            abort(403);
+        }
+        $this->editAssignmentLinks[] = ['title' => '', 'url' => ''];
+    }
+
+    public function removeEditAssignmentLink($index)
+    {
+        $instructor = auth()->user()->instructor;
+        if(!$instructor){
+            abort(403);
+        }
+        unset($this->editAssignmentLinks[$index]);
+        $this->editAssignmentLinks = array_values($this->editAssignmentLinks);
+    }
+
+    public function removeExistingAssignmentFile($index)
+    {
+        $instructor = auth()->user()->instructor;
+        if(!$instructor){
+            abort(403);
+        }
+        unset($this->editAssignmentFiles[$index]);
+        $this->editAssignmentFiles = array_values($this->editAssignmentFiles);
+    }
+
+    public function updatedNewAssignmentFiles()
+    {
+        $instructor = auth()->user()->instructor;
+        if(!$instructor){
+            abort(403);
+        }
+        $this->validate([
+            'newAssignmentFiles.*' => 'file|max:10240',
+        ]);
+
+        if (is_array($this->newAssignmentFiles)) {
+            foreach ($this->newAssignmentFiles as $file) {
+                $this->accumulatedNewAssignmentFiles[] = $file;
+            }
+        } elseif ($this->newAssignmentFiles) {
+            $this->accumulatedNewAssignmentFiles[] = $this->newAssignmentFiles;
+        }
+
+        $this->reset('newAssignmentFiles');
+    }
+
+    public function removeNewAssignmentFile($index)
+    {
+        $instructor = auth()->user()->instructor;
+        if(!$instructor){
+            abort(403);
+        }
+        unset($this->accumulatedNewAssignmentFiles[$index]);
+        $this->accumulatedNewAssignmentFiles = array_values($this->accumulatedNewAssignmentFiles);
+    }
+
+    public function updateAssignment()
+    {
+        $instructor = auth()->user()->instructor;
+        if(!$instructor){
+            abort(403);
+        }
+        $this->validate([
+            'editAssignmentTitle' => 'required|string|max:255',
+            'editAssignmentDescription' => 'nullable|string',
+            'editAssignmentDate' => 'required|date',
+            'editAssignmentTime' => 'required',
+            'accumulatedNewAssignmentFiles.*' => 'nullable|file|max:10240',
+            'editAssignmentLinks.*.title' => 'nullable|string|max:255',
+            'editAssignmentLinks.*.url' => 'nullable|url|max:500',
+        ]);
+
+        if (!$this->selectedAssignment) {
+            return;
+        }
+
+        // Store existing files
+        $finalFiles = $this->editAssignmentFiles;
+
+        // Delete physical files from disk that were removed during editing
+        $originalFilePathData = $this->selectedAssignment->file_path;
+        $originalFiles = is_array($originalFilePathData)
+            ? ($originalFilePathData['files'] ?? [])
+            : [];
+
+        $remainingPaths = array_column($finalFiles, 'path');
+
+        foreach ($originalFiles as $oldFile) {
+            if (isset($oldFile['path']) && !in_array($oldFile['path'], $remainingPaths)) {
+                if (Storage::disk('public')->exists($oldFile['path'])) {
+                    Storage::disk('public')->delete($oldFile['path']);
+                }
+            }
+        }
+
+        // Store any newly uploaded files
+        if ($this->accumulatedNewAssignmentFiles) {
+            $i = count($finalFiles);
+            foreach ($this->accumulatedNewAssignmentFiles as $file) {
+                $i++;
+                $extension = $file->getClientOriginalExtension();
+                $customName = $this->subject->code . '_' . $this->editAssignmentTitle . '_(' . $i . ').' . $extension;
+                $path = $file->storeAs('assignment', $customName, 'public');
+                $finalFiles[] = [
+                    'original_name' => $customName,
+                    'path' => $path,
+                ];
+            }
+        }
+
+        // Filter valid links
+        $validLinks = [];
+        if ($this->editAssignmentLinks) {
+            foreach ($this->editAssignmentLinks as $linkItem) {
+                if (!empty($linkItem['url'])) {
+                    $validLinks[] = [
+                        'title' => !empty($linkItem['title']) ? $linkItem['title'] : $linkItem['url'],
+                        'url' => $linkItem['url'],
+                    ];
+                }
+            }
+        }
+
+        // Combine date and time into due_date timestamp
+        $dueDate = null;
+        if ($this->editAssignmentDate && $this->editAssignmentTime) {
+            $dueDate = \Carbon\Carbon::parse("{$this->editAssignmentDate} {$this->editAssignmentTime}")->format('Y-m-d H:i:s');
+        } elseif ($this->editAssignmentDate) {
+            $dueDate = \Carbon\Carbon::parse("{$this->editAssignmentDate} 23:59:59")->format('Y-m-d H:i:s');
+        }
+
+        $this->selectedAssignment->update([
+            'title' => $this->editAssignmentTitle,
+            'description' => $this->editAssignmentDescription ?: null,
+            'due_date' => $dueDate,
+            'end_time' => $this->editAssignmentTime ?: null,
+            'file_path' => [
+                'files' => $finalFiles,
+                'links' => $validLinks,
+            ],
+        ]);
+
+        $this->showEditAssignmentModal = false;
+        $this->loadAssignment();
+        session()->flash('success', 'Assignment updated successfully.');
     }
 
     public function render()
