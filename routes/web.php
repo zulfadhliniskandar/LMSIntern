@@ -30,10 +30,16 @@ use App\Http\Controllers\AudioController;
 use App\Livewire\AudioGenrator;
 use App\Livewire\UploadMaterialForAudioGeneration;
 use App\Livewire\NotebooklmAudioGenerator;
+use App\Livewire\CreateCourseQuiz;
+use App\Livewire\TakeCourseQuiz;
+use App\Http\Controllers\QuizPdfController;
 
 Route::view('/', 'welcome')->name('home');
 
+use App\Livewire\DetailsEachQuiz;
+
 Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/instructor-course/{subject}/course-quiz/{quiz}/pdf', [QuizPdfController::class, 'download'])->name('instructor-course-quiz-pdf');
     Route::view('dashboard', 'dashboard')->name('dashboard');
     //Route::get('/departments', ListDeparments::class)->name('listDepartments');
     //Route::get('/create-departments', CreateDepartments::class)->name('createDepartments'); 
@@ -70,6 +76,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/audio-generator', AudioGenrator::class)->name('audio-generator');
     Route::get('/audio-upload', UploadMaterialForAudioGeneration::class)->name('audio-upload');
     Route::get('/notebooklm-audio', NotebooklmAudioGenerator::class)->name('notebooklm-audio');
+    Route::get('/instructor-course/{subject}/course-quiz/create', CreateCourseQuiz::class)->name('instructor-course-quiz-create');
+    Route::get('/instructor-course/{subject}/course-quiz/{quiz}', DetailsEachQuiz::class)->name('instructor-course-quiz-details');
+    Route::get('/taking-course/{subject}/quiz/{courseQuiz}', TakeCourseQuiz::class)->name('student-take-course-quiz');
     Route::impersonate();
 });
 

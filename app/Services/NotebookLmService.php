@@ -42,6 +42,9 @@ class NotebookLmService
             @copy($defaultProfileJson, $appAuthJson);
         }
 
+        $scriptService = new AudioScriptGeneratorService();
+        $text = $scriptService->cleanTextForTts($text);
+
         $payload = [
             'text' => $text,
             'title' => $title,

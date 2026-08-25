@@ -5,8 +5,45 @@ import sys
 import json
 import base64
 import time
+import re
 from pathlib import Path
 import edge_tts
+
+def clean_text_for_tts(text: str) -> str:
+    if not text:
+        return ""
+    
+    trimmed = text.strip()
+    if (trimmed.startswith('[') and trimmed.endswith(']')) or (trimmed.startswith('{') and trimmed.endswith('}')):
+        try:
+            data = json.loads(trimmed)
+            if isinstance(data, list):
+                for item in data:
+                    if isinstance(item, dict) and 'text' in item:
+                        item['text'] = clean_text_for_tts(item['text'])
+                return json.dumps(data, ensure_ascii=False)
+        except Exception:
+            pass
+
+    cleaned = re.sub(r'\[([^\]]+)\]\([^)]+\)', r'\1', text)
+    cleaned = re.sub(r'```[\s\S]*?```', '', cleaned)
+    cleaned = re.sub(r'`([^`]+)`', r'\1', cleaned)
+    cleaned = cleaned.replace('`', '')
+    cleaned = re.sub(r'\*{1,3}([^*]+)\*{1,3}', r'\1', cleaned)
+    cleaned = re.sub(r'_{1,3}([^_]+)_{1,3}', r'\1', cleaned)
+    cleaned = re.sub(r'~{1,2}([^~]+)~{1,2}', r'\1', cleaned)
+    cleaned = re.sub(r'[*\u2022\u2023\u25E6\u2043\u204B~^\\\]]', '', cleaned)
+    cleaned = re.sub(r'(?m)^\s*#+\s*', '', cleaned)
+    cleaned = re.sub(r'#([a-zA-Z0-9]+)', r'\1', cleaned)
+    cleaned = cleaned.replace('#', '')
+    cleaned = re.sub(r'(?m)^\s*[\-–—+•*]\s+', '', cleaned)
+    cleaned = re.sub(r'\s+[\-–—]\s+', ', ', cleaned)
+    cleaned = cleaned.replace('|', ', ')
+    cleaned = re.sub(r'([.!?,])\s*,+', r'\1', cleaned)
+    cleaned = re.sub(r',\s*,+', ',', cleaned)
+    cleaned = re.sub(r'[ \t]+', ' ', cleaned)
+    cleaned = re.sub(r'\n{3,}', '\n\n', cleaned)
+    return cleaned.strip()
 
 VOICES = {
     'ms-MY': {
@@ -69,6 +106,8 @@ async def generate_solo_speech(text, output_path, voice_name, rate=1.0, style='d
     """
     Generate standard single-voice speech using Edge TTS
     """
+    text = clean_text_for_tts(text)
+
     if isinstance(rate, (int, float)):
         rate_pct = int(round((rate - 1.0) * 100))
         rate_str = f"{rate_pct:+d}%"
@@ -114,7 +153,7 @@ async def generate_podcast_speech(dialogue_list, output_path, language='en-US', 
 
     for idx, turn in enumerate(dialogue_list):
         speaker_key = str(turn.get('speaker', 'host')).lower().strip()
-        speech_text = turn.get('text', '').strip()
+        speech_text = clean_text_for_tts(turn.get('text', '')).strip()
 
         if not speech_text:
             continue

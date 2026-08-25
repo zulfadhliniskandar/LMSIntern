@@ -9,6 +9,7 @@ use App\Models\MaterialsForSubject;
 use App\Models\User;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Assignment;
+use App\Models\CourseQuizzes;
 
 
 class DetailsAndMaterialSubject extends Component
@@ -20,6 +21,7 @@ class DetailsAndMaterialSubject extends Component
     public Subjects $subject;
     public $materials = [];
     public $assignment = [];
+    public $quizzes = [];
 
     public bool $showEditModal = false;
 
@@ -46,6 +48,20 @@ class DetailsAndMaterialSubject extends Component
     public $newAssignmentFiles = [];
     public $accumulatedNewAssignmentFiles = [];
 
+    // Quiz Edit & Results fields
+    public ?CourseQuizzes $selectedQuiz = null;
+    public bool $showEditQuizModal = false;
+    public $editQuizTitle = '';
+    public $editQuizDescription = '';
+    public $editQuizOpenDate = '';
+    public $editQuizCloseDate = '';
+    public $editQuizTimeLimit = null;
+    public $editQuizMaxAttempts = 1;
+    public $editQuizIsPublished = false;
+
+    public ?CourseQuizzes $selectedQuizForResults = null;
+    public bool $showQuizResultsModal = false;
+
     public function mount(Subjects $subject)
     {
         $instructor = auth()->user()->instructor;
@@ -58,6 +74,7 @@ class DetailsAndMaterialSubject extends Component
         $this->subject = $subject;
         $this->loadMaterials();
         $this->loadAssignment();
+        $this->loadQuizzes();
     }
 
     public function loadMaterials()
@@ -79,6 +96,26 @@ class DetailsAndMaterialSubject extends Component
             abort(403);
         }
         $this->assignment = Assignment::where('subjects_id', $this->subject->id)->latest()->get();
+    }
+
+    public function loadQuizzes()
+    {
+        $instructor = auth()->user()->instructor;
+        $student = auth()->user()->student;
+        
+        if(!$instructor && !$student){
+            abort(403);
+        }
+        $query = CourseQuizzes::where('subject_id', $this->subject->id)
+            ->with(['attempts' => function ($q) {
+                $q->with('user');
+            }]);
+
+        if ($student && !$instructor) {
+            $query->where('isPublished', true);
+        }
+
+        $this->quizzes = $query->latest()->get();
     }
 
     public function openModal($id)
@@ -488,6 +525,95 @@ class DetailsAndMaterialSubject extends Component
         $this->showEditAssignmentModal = false;
         $this->loadAssignment();
         session()->flash('success', 'Assignment updated successfully.');
+    }
+
+    public function openQuizModal($id)
+    {
+        $instructor = auth()->user()->instructor;
+        if(!$instructor){
+            abort(403);
+        }
+        $this->selectedQuiz = CourseQuizzes::findOrFail($id);
+        $this->editQuizTitle = $this->selectedQuiz->title;
+        $this->editQuizDescription = $this->selectedQuiz->description ?? '';
+        $this->editQuizOpenDate = $this->selectedQuiz->open_date ? $this->selectedQuiz->open_date->format('Y-m-d\TH:i') : '';
+        $this->editQuizCloseDate = $this->selectedQuiz->close_date ? $this->selectedQuiz->close_date->format('Y-m-d\TH:i') : '';
+        $this->editQuizTimeLimit = $this->selectedQuiz->time_limit;
+        $this->editQuizMaxAttempts = $this->selectedQuiz->max_attempts ?? 1;
+        $this->editQuizIsPublished = (bool) $this->selectedQuiz->isPublished;
+        $this->showEditQuizModal = true;
+    }
+
+    public function updateQuiz()
+    {
+        $instructor = auth()->user()->instructor;
+        if(!$instructor){
+            abort(403);
+        }
+        $this->validate([
+            'editQuizTitle' => 'required|string|max:255',
+            'editQuizDescription' => 'nullable|string',
+            'editQuizOpenDate' => 'required|date',
+            'editQuizCloseDate' => 'required|date|after:editQuizOpenDate',
+            'editQuizTimeLimit' => 'nullable|integer|min:1|max:600',
+            'editQuizMaxAttempts' => 'required|integer|min:1|max:100',
+        ]);
+
+        if (!$this->selectedQuiz) {
+            return;
+        }
+
+        $this->selectedQuiz->update([
+            'title' => $this->editQuizTitle,
+            'description' => $this->editQuizDescription ?: null,
+            'open_date' => $this->editQuizOpenDate,
+            'close_date' => $this->editQuizCloseDate,
+            'time_limit' => $this->editQuizTimeLimit ? (int) $this->editQuizTimeLimit : null,
+            'max_attempts' => (int) $this->editQuizMaxAttempts,
+            'isPublished' => $this->editQuizIsPublished,
+        ]);
+
+        $this->showEditQuizModal = false;
+        $this->loadQuizzes();
+        session()->flash('success', 'Quiz updated successfully.');
+    }
+
+    public function deleteQuiz($id)
+    {
+        $instructor = auth()->user()->instructor;
+        if(!$instructor){
+            abort(403);
+        }
+        $quiz = CourseQuizzes::find($id);
+        if ($quiz) {
+            $quiz->delete();
+            $this->loadQuizzes();
+            session()->flash('success', 'Quiz deleted successfully.');
+        }
+    }
+
+    public function togglePublishQuiz($id)
+    {
+        $instructor = auth()->user()->instructor;
+        if(!$instructor){
+            abort(403);
+        }
+        $quiz = CourseQuizzes::find($id);
+        if ($quiz) {
+            $quiz->update(['isPublished' => !$quiz->isPublished]);
+            $this->loadQuizzes();
+            session()->flash('success', 'Quiz ' . ($quiz->isPublished ? 'published' : 'unpublished') . ' successfully.');
+        }
+    }
+
+    public function openQuizResultsModal($id)
+    {
+        $instructor = auth()->user()->instructor;
+        if(!$instructor){
+            abort(403);
+        }
+        $this->selectedQuizForResults = CourseQuizzes::with(['attempts.user'])->findOrFail($id);
+        $this->showQuizResultsModal = true;
     }
 
     public function render()

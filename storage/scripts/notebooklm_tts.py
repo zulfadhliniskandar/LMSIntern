@@ -4,6 +4,7 @@ import sys
 import json
 import asyncio
 import base64
+import re
 from pathlib import Path
 
 try:
@@ -11,9 +12,34 @@ try:
 except ImportError:
     NotebookLMClient = None
 
+def clean_text_for_tts(text: str) -> str:
+    if not text:
+        return ""
+    cleaned = re.sub(r'\[([^\]]+)\]\([^)]+\)', r'\1', text)
+    cleaned = re.sub(r'```[\s\S]*?```', '', cleaned)
+    cleaned = re.sub(r'`([^`]+)`', r'\1', cleaned)
+    cleaned = cleaned.replace('`', '')
+    cleaned = re.sub(r'\*{1,3}([^*]+)\*{1,3}', r'\1', cleaned)
+    cleaned = re.sub(r'_{1,3}([^_]+)_{1,3}', r'\1', cleaned)
+    cleaned = re.sub(r'~{1,2}([^~]+)~{1,2}', r'\1', cleaned)
+    cleaned = re.sub(r'[*\u2022\u2023\u25E6\u2043\u204B~^\\\]]', '', cleaned)
+    cleaned = re.sub(r'(?m)^\s*#+\s*', '', cleaned)
+    cleaned = re.sub(r'#([a-zA-Z0-9]+)', r'\1', cleaned)
+    cleaned = cleaned.replace('#', '')
+    cleaned = re.sub(r'(?m)^\s*[\-–—+•*]\s+', '', cleaned)
+    cleaned = re.sub(r'\s+[\-–—]\s+', ', ', cleaned)
+    cleaned = cleaned.replace('|', ', ')
+    cleaned = re.sub(r'([.!?,])\s*,+', r'\1', cleaned)
+    cleaned = re.sub(r',\s*,+', ',', cleaned)
+    cleaned = re.sub(r'[ \t]+', ' ', cleaned)
+    cleaned = re.sub(r'\n{3,}', '\n\n', cleaned)
+    return cleaned.strip()
+
 async def generate_notebooklm_audio(text, title, output_path, storage_path=None):
     if NotebookLMClient is None:
         raise Exception("notebooklm-py package is not installed on this system.")
+
+    text = clean_text_for_tts(text)
 
     # Initialize client from storage state
     if storage_path and Path(storage_path).exists() and Path(storage_path).stat().st_size > 10:

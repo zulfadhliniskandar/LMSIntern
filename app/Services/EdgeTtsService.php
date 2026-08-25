@@ -124,6 +124,9 @@ class EdgeTtsService
 
         @mkdir(dirname($output_path), 0775, true);
 
+        $scriptService = new AudioScriptGeneratorService();
+        $text = $scriptService->cleanTextForTts($text);
+
         try {
             $result = $this->callPythonScript([
                 'text' => $text,

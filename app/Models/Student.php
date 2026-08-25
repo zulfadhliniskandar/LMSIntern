@@ -51,4 +51,9 @@ class Student extends Model
     {
         return $this->hasMany(AssignmentSubmission::class, 'student_id', 'student_id');
     }
+
+    public function quizAttempts()
+    {
+        return $this->hasMany(CouseQuizAttempts::class, 'user_id', 'user_id');
+    }
 }
