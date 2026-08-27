@@ -25,6 +25,10 @@ class AdvisorPageForStudent extends Component
     #[Validate('required|string|min:5|max:1000')]
     public $note;
 
+    public bool $showCancelModal = false;
+    public $selectedAppointment = null;
+    public string $cancel_note;
+
     public function mount()
     {
         $this->student = auth()->user()->student;
@@ -82,6 +86,38 @@ class AdvisorPageForStudent extends Component
         $this->reset(['date', 'time', 'note']);
         $this->loadAppointments();
         session()->flash('message', 'Appointment request submitted successfully!');
+    }
+
+    public function openModalCancel($appointmentId){
+        $this->selectedAppointment = AppointmentWithAdvisor::findOrFail($appointmentId);
+        if($this->selectedAppointment->status != 'pending'){
+            session()->flash('error', 'Only Pending Appointment can be cancelled.');
+            return;
+        }
+        $this->cancel_note = '';
+        $this->resetValidation();
+        $this->showCancelModal = true;
+    }
+
+    public function closeModalCancel(){
+        $this->showCancelModal = false;
+        $this->selectedAppointment = null;
+        $this->cancel_note = '';
+    }
+
+    public function cancelAppointment()
+    {
+        $this->validate([
+            'cancel_note' => 'required|string|min:5|max:1000',
+        ]);
+        $this->selectedAppointment->update([
+            'status' => 'cancelled',
+            'cancel_note' => $this->cancel_note,
+        ]);
+        $this->closeModalCancel();
+        $this->loadAppointments();
+
+        session()->flash('success', 'Appointment cancelled successfully.');
     }
 
     public function render()

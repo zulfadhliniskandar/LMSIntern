@@ -35,4 +35,9 @@ class Subjects extends Model
     {
         return $this->hasMany(MaterialsForSubject::class, 'subject_id');
     }
+
+    public function messages() : HasMany
+    {
+        return $this->hasMany(SubjectMessage::class, 'subject_id');
+    }
 }

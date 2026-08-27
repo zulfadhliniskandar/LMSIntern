@@ -20,6 +20,10 @@ class AdviseeProfile extends Component
     public $currentSubjectsCount = 0;
     public $completedSubjectsCount = 0;
 
+    public bool $showRejectModal = false;
+    public $selectedAppointment = null;
+    public string $reject_note = '';
+
     public function mount($studentId) {
         $this->advisee = User::with(['student.programme.department'])->findOrFail($studentId);
         
@@ -60,6 +64,61 @@ class AdviseeProfile extends Component
         return view('livewire.advisee-profile');
     }
 
+    public function openModalReject($appointmentId = null)
+    {
+        $this->selectedAppointment = $appointmentId
+            ? AppointmentWithAdvisor::find($appointmentId)
+            : $this->pendingAppointment;
+
+        if (!$this->selectedAppointment || $this->selectedAppointment->status !== 'pending') {
+            session()->flash('error', 'Only pending appointments can be rejected.');
+            return;
+        }
+
+        $this->reject_note = '';
+        $this->resetValidation();
+        $this->showRejectModal = true;
+    }
+
+    public function closeModalReject()
+    {
+        $this->showRejectModal = false;
+        $this->selectedAppointment = null;
+        $this->reject_note = '';
+    }
+
+    public function rejectAppointment()
+    {
+        $this->validate([
+            'reject_note' => 'required|string|min:5|max:1000',
+        ]);
+
+        if ($this->selectedAppointment) {
+            $this->selectedAppointment->update([
+                'status' => 'rejected',
+                'reject_note' => $this->reject_note,
+            ]);
+
+            $this->pendingAppointment = null;
+
+            Notification::make()
+                ->title('Appointment Rejected')
+                ->body('Appointment rejected successfully.')
+                ->success()
+                ->send();
+
+            Notification::make()
+                ->title('Appointment Rejected')
+                ->body('Your advisor has declined your appointment request. Reason: ' . $this->reject_note)
+                ->danger()
+                ->sendToDatabase($this->advisee);
+
+            session()->flash('success', 'Appointment rejected successfully.');
+        }
+
+        $this->closeModalReject();
+    }
+
     public function confirmAppointment() {
         if ($this->pendingAppointment) {
             $this->pendingAppointment->update(['status' => 'confirmed']);
@@ -78,29 +137,6 @@ class AdviseeProfile extends Component
                 ->sendToDatabase($this->advisee);
             session()->flash('success', 'Appointment confirmed successfully.');
             return $this->redirect(route('student-profile', $this->advisee));
-            
-        }
-    }
-
-    public function rejectAppointment() {
-        if ($this->pendingAppointment) {
-            $this->pendingAppointment->update(['status' => 'rejected']);
-            $this->pendingAppointment = null;
-
-            Notification::make()
-                ->title('Appointment Rejected')
-                ->body('Appointment rejected successfully.')
-                ->success()
-                ->send();
-
-            Notification::make()
-                ->title('Appointment Rejected')
-                ->body('Your advisor has declined your appointment request.')
-                ->danger()
-                ->sendToDatabase($this->advisee);
-            session()->flash('success', 'Appointment rejected successfully.');
-            $this->redirect(route('student-profile', $this->advisee));
-            
         }
     }
 

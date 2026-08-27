@@ -72,6 +72,7 @@
                         :current="request()->routeIs('notebooklm-audio*')" wire:navigate>
                         {{ __('NotebookLM Podcast') }}
                     </flux:sidebar.item>
+
                 </flux:sidebar.group>
             </flux:sidebar.nav>
         @endif
@@ -124,6 +125,7 @@
                         wire:navigate>
                         {{ __('My Courses') }}
                     </flux:sidebar.item>
+
                 </flux:sidebar.group>
             </flux:sidebar.nav>
         @endif

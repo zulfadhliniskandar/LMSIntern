@@ -456,7 +456,8 @@
     <div class="space-y-4 pt-4">
         <div class="flex items-center justify-between pb-2 border-b border-gray-200 dark:border-gray-700">
             <h2 class="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                <div class="p-2 bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 rounded-xl">
+                <div
+                    class="p-2 bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 rounded-xl">
                     <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -504,26 +505,31 @@
                         <!-- Header Status Badges -->
                         <div class="flex items-center justify-between gap-2">
                             <div class="flex items-center gap-1.5 flex-wrap">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 uppercase tracking-wide">
+                                <span
+                                    class="inline-flex items-center px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 uppercase tracking-wide">
                                     Quiz
                                 </span>
                                 @if(auth()->user()?->isInstructor())
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold {{ $quiz->isPublished ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/60 dark:text-emerald-300' : 'bg-amber-100 text-amber-800 dark:bg-amber-900/60 dark:text-amber-300' }}">
+                                    <span
+                                        class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold {{ $quiz->isPublished ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/60 dark:text-emerald-300' : 'bg-amber-100 text-amber-800 dark:bg-amber-900/60 dark:text-amber-300' }}">
                                         {{ $quiz->isPublished ? 'Published' : 'Draft' }}
                                     </span>
                                 @endif
                             </div>
 
                             <div class="flex items-center gap-1.5 shrink-0">
-                                <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold bg-slate-100 text-slate-700 dark:bg-zinc-800 dark:text-zinc-300">
+                                <span
+                                    class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold bg-slate-100 text-slate-700 dark:bg-zinc-800 dark:text-zinc-300">
                                     {{ $quiz->total_questions }} Qs
                                 </span>
                                 @if($quiz->time_limit)
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold bg-indigo-50 text-indigo-700 dark:bg-indigo-950/50 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-900">
+                                    <span
+                                        class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold bg-indigo-50 text-indigo-700 dark:bg-indigo-950/50 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-900">
                                         {{ $quiz->time_limit }} Mins
                                     </span>
                                 @else
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold bg-slate-100 text-slate-600 dark:bg-zinc-800 dark:text-zinc-400">
+                                    <span
+                                        class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold bg-slate-100 text-slate-600 dark:bg-zinc-800 dark:text-zinc-400">
                                         No Limit
                                     </span>
                                 @endif
@@ -543,11 +549,14 @@
                         </div>
 
                         <!-- Schedule & Limit Information -->
-                        <div class="space-y-1.5 text-xs bg-slate-50 dark:bg-zinc-800/50 p-3 rounded-xl border border-slate-100 dark:border-zinc-800">
+                        <div
+                            class="space-y-1.5 text-xs bg-slate-50 dark:bg-zinc-800/50 p-3 rounded-xl border border-slate-100 dark:border-zinc-800">
                             <div class="flex items-center justify-between text-slate-600 dark:text-zinc-400">
                                 <span class="font-medium flex items-center gap-1">
-                                    <svg class="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    <svg class="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24"
+                                        stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                     </svg>
                                     Open:
                                 </span>
@@ -557,8 +566,10 @@
                             </div>
                             <div class="flex items-center justify-between text-slate-600 dark:text-zinc-400">
                                 <span class="font-medium flex items-center gap-1">
-                                    <svg class="w-3.5 h-3.5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    <svg class="w-3.5 h-3.5 text-amber-500" fill="none" viewBox="0 0 24 24"
+                                        stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
                                     Due Date:
                                 </span>
@@ -566,7 +577,8 @@
                                     {{ $closeDate ? $closeDate->format('M d, Y - h:i A') : 'N/A' }}
                                 </span>
                             </div>
-                            <div class="flex items-center justify-between text-slate-600 dark:text-zinc-400 pt-1.5 border-t border-slate-200/60 dark:border-zinc-700/60">
+                            <div
+                                class="flex items-center justify-between text-slate-600 dark:text-zinc-400 pt-1.5 border-t border-slate-200/60 dark:border-zinc-700/60">
                                 <span class="font-medium">Allowed Attempts:</span>
                                 <span class="font-bold text-indigo-600 dark:text-indigo-400">
                                     {{ $maxAttempts }} {{ $maxAttempts === 1 ? 'Attempt' : 'Attempts' }}
@@ -577,12 +589,15 @@
 
                     <!-- Instructor Action Bar -->
                     @if (auth()->user()?->isInstructor())
-                        <div class="pt-3 border-t border-slate-100 dark:border-zinc-800 flex items-center justify-between gap-2 flex-wrap">
-                            <a href="{{ route('instructor-course-quiz-details', ['subject' => $subject->id, 'quiz' => $quiz->id]) }}" wire:navigate
+                        <div
+                            class="pt-3 border-t border-slate-100 dark:border-zinc-800 flex items-center justify-between gap-2 flex-wrap">
+                            <a href="{{ route('instructor-course-quiz-details', ['subject' => $subject->id, 'quiz' => $quiz->id]) }}"
+                                wire:navigate
                                 class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/60 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 text-xs font-bold transition-colors cursor-pointer"
                                 title="View Quiz Details & Submissions">
                                 <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                                 </svg>
                                 <span>Results & Stats</span>
                             </a>
@@ -620,7 +635,8 @@
                     @if(auth()->user()?->isStudent())
                         <div class="pt-2 border-t border-gray-100 dark:border-gray-700 space-y-2">
                             @if($latestAttempt)
-                                <div class="flex items-center justify-between text-xs p-2 bg-emerald-50 dark:bg-emerald-950/40 rounded-xl border border-emerald-200/60 dark:border-emerald-800/40">
+                                <div
+                                    class="flex items-center justify-between text-xs p-2 bg-emerald-50 dark:bg-emerald-950/40 rounded-xl border border-emerald-200/60 dark:border-emerald-800/40">
                                     <span class="text-emerald-800 dark:text-emerald-300 font-semibold">Latest Score:</span>
                                     <span class="font-bold text-emerald-700 dark:text-emerald-300">
                                         {{ $latestAttempt->score }} / {{ $latestAttempt->total_questions }}
@@ -633,36 +649,46 @@
                                 <a href="{{ route('student-take-course-quiz', [$subject->id, $quiz->id]) }}" wire:navigate
                                     class="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white text-xs font-bold shadow-xs transition-all cursor-pointer">
                                     <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
                                     <span>Continue In-Progress Quiz</span>
                                 </a>
                             @elseif($isOpen && $attemptsLeft > 0)
                                 <div class="space-y-1.5">
-                                    <div class="flex items-center justify-between text-[11px] font-semibold text-slate-500 dark:text-slate-400 px-1">
+                                    <div
+                                        class="flex items-center justify-between text-[11px] font-semibold text-slate-500 dark:text-slate-400 px-1">
                                         <span>Remaining:</span>
-                                        <span class="text-emerald-600 dark:text-emerald-400 font-bold">{{ $attemptsLeft }} of {{ $maxAttempts }} attempts left</span>
+                                        <span class="text-emerald-600 dark:text-emerald-400 font-bold">{{ $attemptsLeft }} of
+                                            {{ $maxAttempts }} attempts left</span>
                                     </div>
                                     <a href="{{ route('student-take-course-quiz', [$subject->id, $quiz->id]) }}" wire:navigate
                                         class="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white text-xs font-bold shadow-xs transition-all cursor-pointer">
                                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                                d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
                                         </svg>
                                         <span>Start Quiz</span>
                                     </a>
                                 </div>
                             @elseif($isNotOpenYet)
                                 <div class="p-2.5 bg-slate-100 dark:bg-gray-700/60 rounded-xl text-center">
-                                    <span class="text-xs font-bold text-slate-600 dark:text-slate-400 block">Quiz Not Open Yet</span>
-                                    <span class="text-[11px] text-slate-500 dark:text-slate-400">Opens {{ $openDate ? $openDate->format('M d, h:i A') : '' }}</span>
+                                    <span class="text-xs font-bold text-slate-600 dark:text-slate-400 block">Quiz Not Open
+                                        Yet</span>
+                                    <span class="text-[11px] text-slate-500 dark:text-slate-400">Opens
+                                        {{ $openDate ? $openDate->format('M d, h:i A') : '' }}</span>
                                 </div>
                             @elseif($isClosed)
-                                <div class="p-2.5 bg-rose-50 dark:bg-rose-950/40 rounded-xl text-center border border-rose-100 dark:border-rose-900/50">
-                                    <span class="text-xs font-bold text-rose-700 dark:text-rose-400 block">Quiz Closed (Due Date Passed)</span>
+                                <div
+                                    class="p-2.5 bg-rose-50 dark:bg-rose-950/40 rounded-xl text-center border border-rose-100 dark:border-rose-900/50">
+                                    <span class="text-xs font-bold text-rose-700 dark:text-rose-400 block">Quiz Closed (Due Date
+                                        Passed)</span>
                                 </div>
                             @elseif($attemptsLeft <= 0)
-                                <div class="p-2.5 bg-amber-50 dark:bg-amber-950/40 rounded-xl text-center border border-amber-100 dark:border-amber-900/50">
-                                    <span class="text-xs font-bold text-amber-700 dark:text-amber-400 block">Max Attempts Reached ({{ $completedCount }}/{{ $maxAttempts }})</span>
+                                <div
+                                    class="p-2.5 bg-amber-50 dark:bg-amber-950/40 rounded-xl text-center border border-amber-100 dark:border-amber-900/50">
+                                    <span class="text-xs font-bold text-amber-700 dark:text-amber-400 block">Max Attempts Reached
+                                        ({{ $completedCount }}/{{ $maxAttempts }})</span>
                                 </div>
                             @endif
                         </div>
@@ -1070,7 +1096,8 @@
                 <!-- Modal Header -->
                 <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-zinc-800">
                     <div class="flex items-center gap-2">
-                        <div class="p-2 bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 rounded-xl">
+                        <div
+                            class="p-2 bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 rounded-xl">
                             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -1078,7 +1105,8 @@
                         </div>
                         <div>
                             <flux:heading size="lg" class="font-bold">Edit Quiz Settings</flux:heading>
-                            <p class="text-xs text-slate-500 dark:text-zinc-400">Update title, schedule, time limit, or attempt count</p>
+                            <p class="text-xs text-slate-500 dark:text-zinc-400">Update title, schedule, time limit, or
+                                attempt count</p>
                         </div>
                     </div>
                 </div>
@@ -1135,7 +1163,8 @@
                         <label class="block text-xs font-bold text-slate-700 dark:text-zinc-300 uppercase tracking-wider">
                             Time Limit (Minutes)
                         </label>
-                        <input type="number" min="1" max="600" wire:model="editQuizTimeLimit" placeholder="Blank for no limit"
+                        <input type="number" min="1" max="600" wire:model="editQuizTimeLimit"
+                            placeholder="Blank for no limit"
                             class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 rounded-xl text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all" />
                         @error('editQuizTimeLimit')
                             <p class="text-xs text-rose-500 font-medium mt-1">{{ $message }}</p>
@@ -1156,8 +1185,10 @@
 
                 <!-- Published Checkbox -->
                 <div class="flex items-center gap-2 pt-2">
-                    <label class="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-zinc-300 cursor-pointer">
-                        <input type="checkbox" wire:model="editQuizIsPublished" class="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500" />
+                    <label
+                        class="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-zinc-300 cursor-pointer">
+                        <input type="checkbox" wire:model="editQuizIsPublished"
+                            class="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500" />
                         <span>Publish Quiz for Students</span>
                     </label>
                 </div>
@@ -1181,15 +1212,18 @@
             <div class="space-y-5">
                 <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-zinc-800">
                     <div>
-                        <flux:heading size="lg" class="font-bold">Student Results: {{ $selectedQuizForResults->title }}</flux:heading>
-                        <p class="text-xs text-slate-500 dark:text-zinc-400">Total Attempts Recorded: {{ $selectedQuizForResults->attempts->count() }}</p>
+                        <flux:heading size="lg" class="font-bold">Student Results: {{ $selectedQuizForResults->title }}
+                        </flux:heading>
+                        <p class="text-xs text-slate-500 dark:text-zinc-400">Total Attempts Recorded:
+                            {{ $selectedQuizForResults->attempts->count() }}</p>
                     </div>
                 </div>
 
                 <div class="overflow-x-auto">
                     <table class="w-full text-left text-xs">
                         <thead>
-                            <tr class="border-b border-slate-200 dark:border-zinc-700 uppercase font-bold text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-zinc-800/50">
+                            <tr
+                                class="border-b border-slate-200 dark:border-zinc-700 uppercase font-bold text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-zinc-800/50">
                                 <th class="py-2.5 px-3">Student</th>
                                 <th class="py-2.5 px-3">Started</th>
                                 <th class="py-2.5 px-3">Completed</th>
@@ -1202,7 +1236,8 @@
                                 <tr>
                                     <td class="py-2.5 px-3 font-semibold text-slate-900 dark:text-white">
                                         {{ $att->user->name ?? 'User #' . $att->user_id }}
-                                        <span class="block text-[11px] font-normal text-slate-500">{{ $att->user->email ?? '' }}</span>
+                                        <span
+                                            class="block text-[11px] font-normal text-slate-500">{{ $att->user->email ?? '' }}</span>
                                     </td>
                                     <td class="py-2.5 px-3 text-slate-600 dark:text-slate-400">
                                         {{ $att->started_at ? $att->started_at->format('M d, Y - h:i A') : 'N/A' }}
@@ -1220,17 +1255,24 @@
                                     </td>
                                     <td class="py-2.5 px-3">
                                         @if(($att->tab_switch_count ?? 0) > 0)
-                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 font-bold text-[11px]"
-                                                  title="Recorded {{ $att->tab_switch_count }} tab/window switch events">
-                                                <svg class="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                            <span
+                                                class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 font-bold text-[11px]"
+                                                title="Recorded {{ $att->tab_switch_count }} tab/window switch events">
+                                                <svg class="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" fill="none"
+                                                    viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                                                 </svg>
-                                                {{ $att->tab_switch_count }} {{ $att->tab_switch_count === 1 ? 'Switch' : 'Switches' }}
+                                                {{ $att->tab_switch_count }}
+                                                {{ $att->tab_switch_count === 1 ? 'Switch' : 'Switches' }}
                                             </span>
                                         @else
-                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-bold text-[11px]">
-                                                <svg class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                                            <span
+                                                class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-bold text-[11px]">
+                                                <svg class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" fill="none"
+                                                    viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                                        d="M5 13l4 4L19 7" />
                                                 </svg>
                                                 Clean Attempt
                                             </span>
@@ -1239,7 +1281,8 @@
                                     <td class="py-2.5 px-3 text-right font-bold text-slate-900 dark:text-white">
                                         @if($att->completed_at)
                                             {{ $att->score }} / {{ $att->total_questions }}
-                                            <span class="text-slate-500 font-normal">({{ round(($att->score / max(1, $att->total_questions)) * 100) }}%)</span>
+                                            <span
+                                                class="text-slate-500 font-normal">({{ round(($att->score / max(1, $att->total_questions)) * 100) }}%)</span>
                                         @else
                                             -
                                         @endif
@@ -1247,7 +1290,8 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5" class="py-6 text-center text-slate-400 italic">No student attempts recorded yet.</td>
+                                    <td colspan="5" class="py-6 text-center text-slate-400 italic">No student attempts recorded
+                                        yet.</td>
                                 </tr>
                             @endforelse
                         </tbody>
@@ -1262,4 +1306,8 @@
             </div>
         @endif
     </flux:modal>
+    <div>
+        <!-- Community Chat Sidebar (Lazy Loaded to maximize LCP performance) -->
+        <livewire:course-chat :subjectId="$subject->id" lazy />
+    </div>
 </div>

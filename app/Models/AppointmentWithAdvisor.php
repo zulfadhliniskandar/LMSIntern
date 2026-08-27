@@ -15,6 +15,8 @@ class AppointmentWithAdvisor extends Model
         'time_appointment',
         'note',
         'status',
+        'cancel_note',
+        'reject_note',
     ];
 
     public function student()

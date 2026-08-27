@@ -14,6 +14,7 @@ class subjectTaking extends Model
         'subject_id',
     ];
 
+
     public function student() : BelongsTo
     {
         return $this->belongsTo(Student::class, 'student_id');

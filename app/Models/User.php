@@ -55,14 +55,14 @@ class User extends Authenticatable implements FilamentUser, PasskeyUser
 
     public function isAdmin(): bool
     {
-        return $this->admin()->exists();
+        return (bool) $this->admin;
     }
 
     public function isNormalUser(): bool
     {
-        return !$this->admin()->exists() && 
-               !$this->instructor()->exists() && 
-               !$this->student()->exists();
+        return !$this->admin && 
+               !$this->instructor && 
+               !$this->student;
     }
 
     public function getIsSuperAdminAttribute(): bool
@@ -72,12 +72,12 @@ class User extends Authenticatable implements FilamentUser, PasskeyUser
 
     public function isStudent(): bool
     {
-        return $this->student()->exists();
+        return (bool) $this->student;
     }
 
     public function isInstructor(): bool
     {
-        return $this->instructor()->exists();
+        return (bool) $this->instructor;
     }
 
     /**
@@ -97,7 +97,7 @@ class User extends Authenticatable implements FilamentUser, PasskeyUser
      */
     public function canAccessPanel(Panel $panel): bool
     {
-        return $this->admin()->exists();
+        return (bool) $this->admin;
     }
 
     /**
