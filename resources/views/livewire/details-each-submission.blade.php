@@ -1,6 +1,18 @@
 <div class="p-6 max-w-7xl mx-auto space-y-6">
+    <!-- Success Flash Message -->
+    @if (session()->has('message'))
+        <div class="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200 flex items-center justify-between shadow-xs">
+            <div class="flex items-center gap-2.5">
+                <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span class="text-xs font-semibold">{{ session('message') }}</span>
+            </div>
+        </div>
+    @endif
+
     <!-- Navigation & Header Bar -->
-    <div class="flex items-center justify-between">
+    <div class="flex flex-wrap items-center justify-between gap-3">
         <a href="{{ route('student-submitted', [$subjectId ?? ($assignment->subjects_id ?? 1), $assignmentId ?? ($assignment->id ?? 1)]) }}"
             wire:navigate
             class="inline-flex items-center text-sm font-semibold text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
@@ -11,10 +23,27 @@
         </a>
 
         @if($submission)
-            <span class="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 uppercase tracking-wider">
-                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                {{ $submission->status ?? 'Submitted' }}
-            </span>
+            <div class="flex items-center gap-3">
+                @if(isset($prevSubmission) && $prevSubmission)
+                    <a href="{{ route('submission-details', [$subjectId, $assignmentId, $prevSubmission->id]) }}" wire:navigate
+                       class="inline-flex items-center gap-1 text-xs font-bold px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-gray-800 text-slate-700 dark:text-slate-300 hover:bg-indigo-50 hover:text-indigo-600 transition-colors">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+                        Prev Student
+                    </a>
+                @endif
+                @if(isset($nextSubmission) && $nextSubmission)
+                    <a href="{{ route('submission-details', [$subjectId, $assignmentId, $nextSubmission->id]) }}" wire:navigate
+                       class="inline-flex items-center gap-1 text-xs font-bold px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-gray-800 text-slate-700 dark:text-slate-300 hover:bg-indigo-50 hover:text-indigo-600 transition-colors">
+                        Next Student
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                    </a>
+                @endif
+
+                <span class="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold rounded-full {{ ($submission->status === 'graded') ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800' : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800' }} uppercase tracking-wider">
+                    <span class="w-2 h-2 rounded-full {{ ($submission->status === 'graded') ? 'bg-indigo-500' : 'bg-emerald-500' }} animate-pulse"></span>
+                    {{ ucfirst($submission->status ?? 'Submitted') }}
+                </span>
+            </div>
         @endif
     </div>
 
@@ -167,6 +196,86 @@
                     @endforeach
                 </div>
             @endif
+        </div>
+
+        <!-- Instructor Evaluation & Grading Card -->
+        <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-xs border border-indigo-100 dark:border-indigo-900/40 space-y-5 relative overflow-hidden">
+            <div class="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-gray-100 dark:border-gray-700">
+                <div class="flex items-center gap-2.5">
+                    <div class="p-2 bg-indigo-50 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400 rounded-xl">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-extrabold text-slate-900 dark:text-white">
+                            Instructor Evaluation & Grading
+                        </h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Award marks and provide constructive feedback to student.</p>
+                    </div>
+                </div>
+                <div>
+                    @if($submission->mark !== null)
+                        <span class="inline-flex items-center gap-1 px-3 py-1 text-xs font-bold rounded-lg bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-300">
+                            Current Grade: {{ $submission->mark }} / 100
+                        </span>
+                    @else
+                        <span class="inline-flex items-center gap-1 px-3 py-1 text-xs font-bold rounded-lg bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300">
+                            Pending Evaluation
+                        </span>
+                    @endif
+                </div>
+            </div>
+
+            <form wire:submit.prevent="saveGrade" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <!-- Mark Input -->
+                    <div class="md:col-span-1 space-y-1.5">
+                        <label for="mark" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">
+                            Score / Mark (Max 100)
+                        </label>
+                        <div class="relative">
+                            <input type="number" id="mark" wire:model.defer="mark" step="0.1" min="0" max="100" placeholder="e.g. 85"
+                                class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-gray-900/80 border border-slate-200 dark:border-gray-700 rounded-xl text-sm font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all">
+                            <span class="absolute right-3 top-2.5 text-xs font-semibold text-slate-400">/ 100</span>
+                        </div>
+                        @error('mark') <span class="text-xs text-rose-500 font-semibold">{{ $message }}</span> @enderror
+                    </div>
+
+                    <!-- Feedback Textarea -->
+                    <div class="md:col-span-3 space-y-1.5">
+                        <label for="feedback" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">
+                            Instructor Comments & Feedback
+                        </label>
+                        <textarea id="feedback" wire:model.defer="feedback" rows="3" placeholder="Provide feedback or remarks for the student..."
+                            class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-gray-900/80 border border-slate-200 dark:border-gray-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all resize-none"></textarea>
+                        @error('feedback') <span class="text-xs text-rose-500 font-semibold">{{ $message }}</span> @enderror
+                    </div>
+                </div>
+
+                <!-- Submit Buttons -->
+                <div class="flex flex-wrap items-center justify-end gap-3 pt-2">
+                    <button type="button" wire:click="saveGrade" wire:loading.attr="disabled"
+                        class="inline-flex items-center gap-2 px-4 py-2.5 bg-slate-900 dark:bg-slate-100 hover:bg-slate-800 dark:hover:bg-white text-white dark:text-slate-900 text-xs font-bold rounded-xl transition-colors shadow-xs disabled:opacity-50">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span wire:loading.remove wire:target="saveGrade">Save Grade</span>
+                        <span wire:loading wire:target="saveGrade">Saving...</span>
+                    </button>
+
+                    @if(isset($nextSubmission) && $nextSubmission)
+                        <button type="button" wire:click="saveAndNext" wire:loading.attr="disabled"
+                            class="inline-flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition-colors shadow-md shadow-indigo-500/20 disabled:opacity-50">
+                            <span wire:loading.remove wire:target="saveAndNext">Save & Next Student</span>
+                            <span wire:loading wire:target="saveAndNext">Saving...</span>
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                            </svg>
+                        </button>
+                    @endif
+                </div>
+            </form>
         </div>
 
         <!-- Plagiarism & AI Detection Status Card -->

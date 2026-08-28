@@ -29,10 +29,13 @@
 
         <div class="px-6 pb-6 pt-0 relative flex flex-col md:flex-row md:items-end md:justify-between gap-4 -mt-12">
             <div class="flex flex-col sm:flex-row items-center sm:items-end gap-4 text-center sm:text-left">
-                {{-- Avatar --}}
                 <div
-                    class="w-24 h-24 rounded-2xl bg-indigo-600 dark:bg-indigo-500 text-white font-bold text-3xl flex items-center justify-center border-4 border-white dark:border-zinc-800 shadow-md uppercase tracking-wider">
-                    {{ substr($advisee->name, 0, 2) }}
+                    class="w-24 h-24 rounded-2xl bg-indigo-600 dark:bg-indigo-500 text-white font-bold text-3xl flex items-center justify-center border-4 border-white dark:border-zinc-800 shadow-md uppercase tracking-wider overflow-hidden shrink-0">
+                    @if ($advisee->passport_photo)
+                        <img src="{{ \Illuminate\Support\Facades\Storage::url($advisee->passport_photo) }}" alt="{{ $advisee->name }}" class="w-full h-full object-cover" />
+                    @else
+                        {{ substr($advisee->name, 0, 2) }}
+                    @endif
                 </div>
 
                 <div class="mt-2 sm:mt-0">

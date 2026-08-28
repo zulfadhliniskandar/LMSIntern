@@ -42,6 +42,12 @@
                                 d="M12 4.5v15m7.5-7.5h-15" />
                         </svg>
                         <span>Create Quiz</span>
+                    <a href="{{ route('instructor-course-students', $subject->id) }}" wire:navigate
+                        class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 active:bg-teal-800 text-white text-xs font-bold shadow-xs transition-all cursor-pointer">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                        </svg>
+                        <span>Enrolled Students</span>
                     </a>
                 </div>
             @endif

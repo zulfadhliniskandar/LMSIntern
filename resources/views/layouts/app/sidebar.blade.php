@@ -79,22 +79,23 @@
         @if(auth()->user()->isInstructor())
             <flux:sidebar.nav>
                 <flux:sidebar.group :heading="__('Advising')" class="grid">
-                    <flux:sidebar.item icon="user-plus" :href="route('instructor-advising')"
+                    {{-- <flux:sidebar.item icon="user-plus" :href="route('instructor-advising')"
                         :current="request()->routeIs('instructor-advising')" wire:navigate>
                         {{ __('Advising') }}
                         @php
-                            $pendingAdvisingRequests = auth()->user()->instructor?->advisingRequests()->where('status', 'pending')->count() ?? 0;
+                        $pendingAdvisingRequests = auth()->user()->instructor?->advisingRequests()->where('status',
+                        'pending')->count() ?? 0;
                         @endphp
                         @if ($pendingAdvisingRequests > 0)
-                            <span
-                                class="ml-auto px-2 py-0.5 text-xs font-semibold bg-rose-500/20 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 rounded-full inline-flex items-center justify-center min-w-[20px]">
-                                {{ $pendingAdvisingRequests }}
-                            </span>
+                        <span
+                            class="ml-auto px-2 py-0.5 text-xs font-semibold bg-rose-500/20 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 rounded-full inline-flex items-center justify-center min-w-[20px]">
+                            {{ $pendingAdvisingRequests }}
+                        </span>
                         @endif
-                    </flux:sidebar.item>
+                    </flux:sidebar.item> --}}
                     <flux:sidebar.item icon="user-plus" :href="route('instructor-advising-copy')"
                         :current="request()->routeIs('instructor-advising-copy')" wire:navigate>
-                        {{ __('Advising Copy') }}
+                        {{ __('Advising') }}
                         @php
                             $pendingAdvisingRequests = auth()->user()->instructor?->advisingRequests()->where('status', 'pending')->count() ?? 0;
                         @endphp
@@ -154,13 +155,17 @@
         <flux:spacer />
 
         <flux:dropdown position="top" align="end">
-            <flux:profile :initials="auth()->user()->initials()" icon-trailing="chevron-down" />
+            <flux:profile
+                :avatar="auth()->user()->passport_photo ? \Illuminate\Support\Facades\Storage::url(auth()->user()->passport_photo) : null"
+                :initials="auth()->user()->initials()" icon-trailing="chevron-down" />
 
             <flux:menu>
                 <flux:menu.radio.group>
                     <div class="p-0 text-sm font-normal">
                         <div class="flex items-center gap-2 px-1 py-1.5 text-start text-sm">
-                            <flux:avatar :name="auth()->user()->name" :initials="auth()->user()->initials()" />
+                            <flux:avatar :name="auth()->user()->name"
+                                :src="auth()->user()->passport_photo ? \Illuminate\Support\Facades\Storage::url(auth()->user()->passport_photo) : null"
+                                :initials="auth()->user()->initials()" />
 
                             <div class="grid flex-1 text-start text-sm leading-tight">
                                 <flux:heading class="truncate">{{ auth()->user()->name }}</flux:heading>
@@ -174,7 +179,8 @@
 
                 <flux:menu.radio.group>
                     @if(app('impersonate')->isImpersonating())
-                        <flux:menu.item href="{{ route('impersonate.leave') }}" icon="user-minus" class="text-amber-600 dark:text-amber-400 font-bold">
+                        <flux:menu.item href="{{ route('impersonate.leave') }}" icon="user-minus"
+                            class="text-amber-600 dark:text-amber-400 font-bold">
                             {{ __('Leave Impersonation') }}
                         </flux:menu.item>
                         <flux:menu.separator />

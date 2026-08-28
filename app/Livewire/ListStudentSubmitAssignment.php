@@ -13,7 +13,10 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
-use Filament\Actions\Action;
+use Filament\Actions\Action as TableAction;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
+use Filament\Notifications\Notification;
 use Livewire\Component;
 
 class ListStudentSubmitAssignment extends Component implements HasActions, HasForms, HasTable
@@ -91,6 +94,10 @@ class ListStudentSubmitAssignment extends Component implements HasActions, HasFo
                             return 'pending';
                         }
 
+                        if ($submission->status === 'graded') {
+                            return 'graded';
+                        }
+
                         $dueDate = $this->assignment?->due_date;
                         if (!$dueDate) {
                             return 'on_time';
@@ -101,20 +108,82 @@ class ListStudentSubmitAssignment extends Component implements HasActions, HasFo
                             : 'late';
                     })
                     ->color(fn (string $state): string => match ($state) {
+                        'graded' => 'info',
                         'on_time' => 'success',
                         'late' => 'danger',
                         default => 'gray',
                     })
                     ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'graded' => 'Graded',
                         'on_time' => 'On Time',
                         'late' => 'Late',
                         default => ucfirst($state),
                     }),
+                TextColumn::make('mark')
+                    ->label('Mark')
+                    ->getStateUsing(function (Student $record) {
+                        $sub = $record->submissions
+                            ->where('assignment_id', $this->assignmentId)
+                            ->first()
+                            ?? \App\Models\AssignmentSubmission::where('student_id', $record->student_id)
+                                ->where('assignment_id', $this->assignmentId)
+                                ->first();
 
+                        return ($sub && $sub->mark !== null) ? ($sub->mark . ' / 100') : 'Not Graded';
+                    })
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'Not Graded' => 'warning',
+                        default => 'success',
+                    }),
             ])
             ->defaultSort('student_id', 'asc')
             ->actions([
-                Action::make('viewSubmission')
+                TableAction::make('gradeSubmission')
+                    ->label('Grade')
+                    ->icon('heroicon-m-pencil-square')
+                    ->color('success')
+                    ->form([
+                        TextInput::make('mark')
+                            ->label('Mark / Score (Max 100)')
+                            ->numeric()
+                            ->minValue(0)
+                            ->maxValue(100)
+                            ->default(function (Student $record) {
+                                $sub = \App\Models\AssignmentSubmission::where('student_id', $record->student_id)
+                                    ->where('assignment_id', $this->assignmentId)
+                                    ->first();
+                                return $sub?->mark;
+                            }),
+                        Textarea::make('feedback')
+                            ->label('Feedback / Remarks')
+                            ->rows(3)
+                            ->default(function (Student $record) {
+                                $sub = \App\Models\AssignmentSubmission::where('student_id', $record->student_id)
+                                    ->where('assignment_id', $this->assignmentId)
+                                    ->first();
+                                return $sub?->feedback;
+                            }),
+                    ])
+                    ->action(function (Student $record, array $data) {
+                        $sub = \App\Models\AssignmentSubmission::where('student_id', $record->student_id)
+                            ->where('assignment_id', $this->assignmentId)
+                            ->first();
+
+                        if ($sub) {
+                            $sub->update([
+                                'mark' => ($data['mark'] !== null && $data['mark'] !== '') ? (float)$data['mark'] : null,
+                                'feedback' => $data['feedback'] ?? null,
+                                'status' => 'graded',
+                            ]);
+
+                            Notification::make()
+                                ->title('Grade Saved Successfully')
+                                ->success()
+                                ->send();
+                        }
+                    }),
+                TableAction::make('viewSubmission')
                     ->label('View Details')
                     ->icon('heroicon-m-eye')
                     ->color('primary')

@@ -18,6 +18,9 @@ class DetailsEachSubmission extends Component
     public $subject;
     public $student;
 
+    public $mark;
+    public $feedback;
+
     public function mount($subject = null, $assignment = null, $submission = null)
     {
         $subId = is_object($submission) ? $submission->id : $submission;
@@ -33,6 +36,8 @@ class DetailsEachSubmission extends Component
                 $this->subject = $this->assignment?->subject;
                 $this->subjectId = $this->subject?->id;
                 $this->student = $this->submission->student;
+                $this->mark = $this->submission->mark;
+                $this->feedback = $this->submission->feedback;
             }
         }
 
@@ -44,8 +49,52 @@ class DetailsEachSubmission extends Component
         }
     }
 
+    public function saveGrade()
+    {
+        $this->validate([
+            'mark' => 'nullable|numeric|min:0|max:100',
+            'feedback' => 'nullable|string|max:2000',
+        ]);
+
+        if ($this->submission) {
+            $this->submission->update([
+                'mark' => ($this->mark !== '' && $this->mark !== null) ? (float)$this->mark : null,
+                'feedback' => $this->feedback,
+                'status' => 'graded',
+            ]);
+            $this->submission->refresh();
+            session()->flash('message', 'Grade and feedback saved successfully!');
+        }
+    }
+
+    public function saveAndNext()
+    {
+        $this->saveGrade();
+
+        $nextSub = AssignmentSubmission::where('assignment_id', $this->assignmentId)
+            ->where('id', '>', $this->submissionId)
+            ->orderBy('id', 'asc')
+            ->first();
+
+        if ($nextSub) {
+            return $this->redirect(route('submission-details', [
+                'subject' => $this->subjectId,
+                'assignment' => $this->assignmentId,
+                'submission' => $nextSub->id,
+            ]), navigate: true);
+        } else {
+            session()->flash('message', 'Grade saved! Reached the last student submission.');
+        }
+    }
+
     public function render()
     {
-        return view('livewire.details-each-submission');
+        $nextSub = $this->submissionId ? AssignmentSubmission::where('assignment_id', $this->assignmentId)->where('id', '>', $this->submissionId)->orderBy('id', 'asc')->first() : null;
+        $prevSub = $this->submissionId ? AssignmentSubmission::where('assignment_id', $this->assignmentId)->where('id', '<', $this->submissionId)->orderBy('id', 'desc')->first() : null;
+
+        return view('livewire.details-each-submission', [
+            'nextSubmission' => $nextSub,
+            'prevSubmission' => $prevSub,
+        ]);
     }
 }

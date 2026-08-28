@@ -39,8 +39,12 @@
             <div class="relative flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
                 <div class="flex items-center gap-5">
                     <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 p-0.5 shadow-md shrink-0">
-                        <div class="w-full h-full bg-white dark:bg-gray-900 rounded-[14px] flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-black text-xl sm:text-2xl uppercase">
-                            {{ substr($advisor->user->name ?? 'A', 0, 2) }}
+                        <div class="w-full h-full bg-white dark:bg-gray-900 rounded-[14px] flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-black text-xl sm:text-2xl uppercase overflow-hidden">
+                            @if ($advisor->user?->passport_photo)
+                                <img src="{{ \Illuminate\Support\Facades\Storage::url($advisor->user->passport_photo) }}" alt="{{ $advisor->user->name }}" class="w-full h-full object-cover rounded-[14px]" />
+                            @else
+                                {{ substr($advisor->user->name ?? 'A', 0, 2) }}
+                            @endif
                         </div>
                     </div>
 

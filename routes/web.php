@@ -38,7 +38,10 @@ Route::view('/', 'welcome')->name('home');
 
 use App\Livewire\DetailsEachQuiz;
 
+use App\Livewire\MyStudentForEachSubject;
+
 Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/instructor-course/{subject}/students', MyStudentForEachSubject::class)->name('instructor-course-students');
     Route::get('/instructor-course/{subject}/course-quiz/{quiz}/pdf', [QuizPdfController::class, 'download'])->name('instructor-course-quiz-pdf');
     Route::view('dashboard', 'dashboard')->name('dashboard');
     //Route::get('/departments', ListDeparments::class)->name('listDepartments');

@@ -13,6 +13,8 @@ class AssignmentSubmission extends Model
         'submission_text',
         'status',
         'file_path',
+        'mark',
+        'feedback',
     ];
 
     protected $casts = [
